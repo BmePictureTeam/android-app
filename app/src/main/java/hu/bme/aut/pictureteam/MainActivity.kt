@@ -1,5 +1,6 @@
 package hu.bme.aut.pictureteam
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     var instruments = listOf<Instrument>();
 
+    @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -22,13 +24,9 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             instruments = Api.create().getInstruments(20).instruments
-            //test
-            Log.d("asd", instruments.toString())
 
             for (instrument in instruments) {
-                //TODO: list instruments on screen
                 instrument.name
-                //layout inflate, list of rows
                 val rowItem = LayoutInflater.from(context).inflate(R.layout.instruments_row, null)
                 rowItem.row_instrument_name.text = instrument.name
                 rowItem.row_instrument_family.text = instrument.family
