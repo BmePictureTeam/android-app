@@ -15,7 +15,7 @@ interface Api {
     suspend fun getInstruments(@Query("count") count: Int = 10): ApiInstrumentsResponse
 
     companion object {
-        private const val URL: String = "https://temalab.cicum.icu"
+        private const val URL: String = "https://api.temalab.cicum.icu"
 
         fun create(): Api {
             val retrofit = Retrofit.Builder()
