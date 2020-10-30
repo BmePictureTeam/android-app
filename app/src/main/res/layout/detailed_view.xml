@@ -7,13 +7,12 @@
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.PlaceholderFragment">
+    tools:context=".ui.main.DetailedView">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context=".ui.main.PlaceholderFragment">
+        android:layout_height="wrap_content" >
 
         <ImageButton
             android:id="@+id/imgbtnUpload"
