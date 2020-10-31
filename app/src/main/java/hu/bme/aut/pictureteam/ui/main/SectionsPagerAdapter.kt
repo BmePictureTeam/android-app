@@ -21,10 +21,10 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
     override fun getItem(position: Int): Fragment {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
-        if (position == 0) {
-            return DetailedView.newInstance(1)
-        } else if (position == 1) {
-            return ListView.newInstance(2)
+        if (position == 1) {
+            return DetailedView.newInstance(2)
+        } else if (position == 0) {
+            return ListView.newInstance(1)
         } else throw ArrayIndexOutOfBoundsException("No such tab with given index")
     }
 
