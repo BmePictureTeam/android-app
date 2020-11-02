@@ -8,13 +8,14 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import hu.bme.aut.pictureteam.R
 import kotlinx.android.synthetic.main.list_view.view.*
 import kotlinx.android.synthetic.main.recycler_view.view.*
 
-class ListView : Fragment() {
+class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
     private lateinit var pageViewModel: PageViewModel
-
+    private lateinit var adapter: PictureAdapter
     private lateinit var root: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,11 +37,22 @@ class ListView : Fragment() {
         root.btnSearch.setOnClickListener {
             Toast.makeText(context,"Not yet implemented!", Toast.LENGTH_SHORT).show()
             //TODO("Not yet implemented!")
+            //http kérés
         }
 
-        root.recyclerview
+        initRecyclerView()
 
         return root
+    }
+
+    private fun initRecyclerView() {
+        root.recyclerview.layoutManager = LinearLayoutManager(context)
+        adapter = PictureAdapter(this)
+        adapter.addItem("Macska")
+        adapter.addItem("Cica")
+        adapter.addItem("Kutya")
+        adapter.addItem("Glaucus Atlanticus")
+        root.recyclerview.adapter = adapter
     }
 
     companion object {
@@ -54,5 +66,10 @@ class ListView : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onPictureSelected(s: String?) {
+        Toast.makeText(context,"Not yet implemented!", Toast.LENGTH_SHORT).show()
+        //TODO("Not yet implemented")
     }
 }
