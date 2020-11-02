@@ -20,13 +20,13 @@
             android:autofillHints=""
             android:inputType="text"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/button2"
+            app:layout_constraintEnd_toStartOf="@+id/btnSearch"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="LabelFor" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btnSearch"
             android:layout_width="100dp"
 
             android:layout_height="wrap_content"

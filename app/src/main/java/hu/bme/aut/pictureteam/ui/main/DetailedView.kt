@@ -12,7 +12,9 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -21,11 +23,9 @@ import androidx.lifecycle.ViewModelProviders
 import hu.bme.aut.pictureteam.R
 import kotlinx.android.synthetic.main.detailed_view.view.*
 
-/**
- * A placeholder fragment containing a simple view.
- */
 class DetailedView : Fragment() {
     private lateinit var imgbtn: ImageButton
+    private lateinit var uploadbtn: Button
 
     private lateinit var pageViewModel: PageViewModel
 
@@ -41,15 +41,19 @@ class DetailedView : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.detailed_view, container, false)
-//        val textView: TextView = root.findViewById(R.id.LName)
         pageViewModel.text.observe(viewLifecycleOwner, Observer<String> {
-//            textView.text = it
         })
 
         root.imgbtnUpload.setOnClickListener {
             context?.let { it1 -> selectImage(it1) }
         }
         imgbtn = root.imgbtnUpload
+
+        root.btnUpload.setOnClickListener {
+            Toast.makeText(context,"Not yet implemented!", Toast.LENGTH_SHORT).show()
+            //TODO("Not yet implemented!")
+        }
+        uploadbtn = root.btnUpload
 
         return root
     }
@@ -74,6 +78,7 @@ class DetailedView : Fragment() {
             }
         }
     }
+
     private fun selectImage(context: Context) {
         val options = arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)

@@ -12,7 +12,9 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -20,9 +22,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import hu.bme.aut.pictureteam.R
 import kotlinx.android.synthetic.main.detailed_view.view.*
+import kotlinx.android.synthetic.main.list_view.view.*
 
 class ListView : Fragment() {
     private lateinit var pageViewModel: PageViewModel
+
+    private lateinit var searchbtn: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,20 +45,19 @@ class ListView : Fragment() {
         pageViewModel.text.observe(viewLifecycleOwner, Observer<String> {
 //            textView.text = it
         })
+
+        searchbtn = root.btnSearch
+        searchbtn.setOnClickListener {
+            Toast.makeText(context,"Not yet implemented!", Toast.LENGTH_SHORT).show()
+            //TODO("Not yet implemented!")
+        }
+
         return root
     }
 
     companion object {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
         private const val ARG_SECTION_NUMBER = "section_number"
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
         @JvmStatic
         fun newInstance(sectionNumber: Int): ListView {
             return ListView().apply {
