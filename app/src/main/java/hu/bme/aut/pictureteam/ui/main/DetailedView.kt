@@ -1,8 +1,11 @@
 package hu.bme.aut.pictureteam.ui.main
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -17,16 +20,19 @@ import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import hu.bme.aut.pictureteam.MainActivity
 import hu.bme.aut.pictureteam.R
 import kotlinx.android.synthetic.main.detailed_view.view.*
+
 
 class DetailedView : Fragment() {
     private lateinit var imgbtn: ImageButton
     private lateinit var uploadbtn: Button
-
+    private lateinit var mainActivity: MainActivity
     private lateinit var pageViewModel: PageViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +56,7 @@ class DetailedView : Fragment() {
         imgbtn = root.imgbtnUpload
 
         root.btnUpload.setOnClickListener {
-            Toast.makeText(context,"Not yet implemented!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Not yet implemented!", Toast.LENGTH_SHORT).show()
             //TODO("Not yet implemented!")
         }
         uploadbtn = root.btnUpload
@@ -59,21 +65,14 @@ class DetailedView : Fragment() {
     }
 
     companion object {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
         private const val ARG_SECTION_NUMBER = "section_number"
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
         @JvmStatic
-        fun newInstance(sectionNumber: Int): DetailedView {
+        fun newInstance(mainActivity: MainActivity): DetailedView {
             return DetailedView().apply {
+                this.mainActivity = mainActivity
                 arguments = Bundle().apply {
-                    putInt(ARG_SECTION_NUMBER, sectionNumber)
+                    putInt(ARG_SECTION_NUMBER, 2)
                 }
             }
         }
@@ -88,6 +87,7 @@ class DetailedView : Fragment() {
                 val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 startActivityForResult(takePicture, 0)
             } else if (options[item] == "Choose from Gallery") {
+                verifyStoragePermissions(mainActivity)
                 val pickPhoto =
                     Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                 startActivityForResult(pickPhoto, 1)
@@ -124,6 +124,36 @@ class DetailedView : Fragment() {
                     }
                 }
             }
+        }
+    }
+
+    // Storage Permissions
+    private val REQUEST_EXTERNAL_STORAGE = 1
+    private val PERMISSIONS_STORAGE = arrayOf<String>(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    )
+
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    fun verifyStoragePermissions(activity: Activity?) {
+        // Check if we have write permission
+        val permission = ActivityCompat.checkSelfPermission(
+            activity!!,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                activity,
+                PERMISSIONS_STORAGE,
+                REQUEST_EXTERNAL_STORAGE
+            )
         }
     }
 }

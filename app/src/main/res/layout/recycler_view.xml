@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:listitem="@layout/row_item">
+    tools:listitem="@layout/row_item"
+    android:id="@+id/recyclerview">
 
 </androidx.recyclerview.widget.RecyclerView>

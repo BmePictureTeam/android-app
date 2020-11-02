@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import hu.bme.aut.pictureteam.MainActivity
 import hu.bme.aut.pictureteam.R
 
 private val TAB_TITLES = arrayOf(
@@ -15,16 +16,16 @@ private val TAB_TITLES = arrayOf(
  * A [FragmentPagerAdapter] that returns a fragment corresponding to
  * one of the sections/tabs/pages.
  */
-class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
+class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, val mainActivity: MainActivity) :
     FragmentPagerAdapter(fm) {
 
     override fun getItem(position: Int): Fragment {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
         if (position == 1) {
-            return DetailedView.newInstance(2)
+            return DetailedView.newInstance(mainActivity)
         } else if (position == 0) {
-            return ListView.newInstance(1)
+            return ListView.newInstance()
         } else throw ArrayIndexOutOfBoundsException("No such tab with given index")
     }
 
