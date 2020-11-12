@@ -23,7 +23,7 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, va
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
         if (position == 1) {
-            return DetailedView.newInstance(mainActivity)
+            return UploadView.newInstance(mainActivity)
         } else if (position == 0) {
             return ListView.newInstance()
         } else throw ArrayIndexOutOfBoundsException("No such tab with given index")

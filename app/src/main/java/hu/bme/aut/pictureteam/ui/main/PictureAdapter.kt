@@ -5,14 +5,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import hu.bme.aut.pictureteam.R
+import hu.bme.aut.pictureteam.models.Picture
 import kotlinx.android.synthetic.main.row_item.view.*
 
 class PictureAdapter internal constructor(private val listener: OnPictureSelectedListener?) :
     RecyclerView.Adapter<PictureAdapter.PictureViewHolder>() {
-    private val pictures: MutableList<String>
+    private val pictures: MutableList<Picture>
 
     interface OnPictureSelectedListener {
-        fun onPictureSelected(s: String?)
+        fun onPictureSelected(item: Int?)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PictureViewHolder {
@@ -23,8 +24,8 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
 
     override fun onBindViewHolder(holder: PictureViewHolder, position: Int) {
         val item = pictures[position]
-        holder.nameTextView.text = pictures[position]
-        holder.item = item
+        holder.nameTextView.text = pictures[position].name
+        holder.item = position
     }
 
     override fun getItemCount(): Int {
@@ -32,16 +33,16 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
     }
 
     fun addItem(s: String) {
-        pictures.add(s)
+        val p = Picture(null, s, mutableListOf(), "", "")
+        pictures.add(p)
         notifyItemInserted(pictures.size - 1)
-        //TODO("Not yet implemented")
     }
 
     inner class PictureViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val picture = itemView.row_image
         val nameTextView = itemView.row_item_name
         val categoryTextView = itemView.row_item_name
-        var item: String? = null
+        var item: Int? = null
 
         init {
             itemView.setOnClickListener { listener?.onPictureSelected(item) }

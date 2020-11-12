@@ -17,7 +17,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -29,11 +28,12 @@ import hu.bme.aut.pictureteam.R
 import kotlinx.android.synthetic.main.detailed_view.view.*
 
 
-class DetailedView : Fragment() {
+class UploadView : Fragment() {
     private lateinit var imgbtn: ImageButton
     private lateinit var uploadbtn: Button
     private lateinit var mainActivity: MainActivity
     private lateinit var pageViewModel: PageViewModel
+    private var selectedImage: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,8 +56,11 @@ class DetailedView : Fragment() {
         imgbtn = root.imgbtnUpload
 
         root.btnUpload.setOnClickListener {
-            Toast.makeText(context, "Not yet implemented!", Toast.LENGTH_SHORT).show()
-            //TODO("Not yet implemented!")
+            if (selectedImage == null) {
+                return@setOnClickListener
+            }
+
+
         }
         uploadbtn = root.btnUpload
 
@@ -68,8 +71,8 @@ class DetailedView : Fragment() {
         private const val ARG_SECTION_NUMBER = "section_number"
 
         @JvmStatic
-        fun newInstance(mainActivity: MainActivity): DetailedView {
-            return DetailedView().apply {
+        fun newInstance(mainActivity: MainActivity): UploadView {
+            return UploadView().apply {
                 this.mainActivity = mainActivity
                 arguments = Bundle().apply {
                     putInt(ARG_SECTION_NUMBER, 2)
@@ -103,22 +106,23 @@ class DetailedView : Fragment() {
         if (resultCode != AppCompatActivity.RESULT_CANCELED) {
             when (requestCode) {
                 0 -> if (resultCode == AppCompatActivity.RESULT_OK && data != null) {
-                    val selectedImage = data.extras!!["data"] as Bitmap?
+                    selectedImage = data.extras!!["data"] as Bitmap?
                     imgbtn.setImageBitmap(selectedImage)
                 }
                 1 -> if (resultCode == AppCompatActivity.RESULT_OK && data != null) {
-                    val selectedImage: Uri? = data.data
+                    val imgData: Uri? = data.data
                     val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
-                    if (selectedImage != null) {
+                    if (imgData != null) {
                         val cursor: Cursor? = context?.contentResolver?.query(
-                            selectedImage,
+                            imgData,
                             filePathColumn, null, null, null
                         )
                         if (cursor != null) {
                             cursor.moveToFirst()
                             val columnIndex: Int = cursor.getColumnIndex(filePathColumn[0])
                             val picturePath: String = cursor.getString(columnIndex)
-                            imgbtn.setImageBitmap(BitmapFactory.decodeFile(picturePath))
+                            selectedImage = BitmapFactory.decodeFile(picturePath)
+                            imgbtn.setImageBitmap(selectedImage)
                             cursor.close()
                         }
                     }

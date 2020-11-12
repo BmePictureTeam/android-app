@@ -1,17 +1,26 @@
 package hu.bme.aut.pictureteam.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.bme.aut.pictureteam.R
+import hu.bme.aut.pictureteam.models.ApiPicture
+import hu.bme.aut.pictureteam.models.Picture
+import hu.bme.aut.pictureteam.services.Api
+import hu.bme.aut.pictureteam.services.Categories
+import hu.bme.aut.pictureteam.services.Categories.categoryIdToTitle
 import kotlinx.android.synthetic.main.list_view.view.*
 import kotlinx.android.synthetic.main.recycler_view.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
     private lateinit var pageViewModel: PageViewModel
@@ -35,9 +44,19 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
         })
 
         root.btnSearch.setOnClickListener {
-            Toast.makeText(context,"Not yet implemented!", Toast.LENGTH_SHORT).show()
-            //TODO("Not yet implemented!")
-            //http kérés
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    apiImages = Api.create().getPictures().pictures
+                    for (p in apiImages) {
+                        val pic = Picture(null, p.title, mutableListOf(), p.description, "")
+                        //TODO: képet be kéne állítani/letölteni: getpicture
+                        for (c in p.categories) {
+                            categoryIdToTitle[c]?.let { it1 -> pic.categories.add(it1) }
+                        }
+                        images.add(pic)
+                    }
+                }
+            }
         }
 
         initRecyclerView()
@@ -57,6 +76,10 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
 
     companion object {
         private const val ARG_SECTION_NUMBER = "section_number"
+        var pictureSelected: Int? = null
+
+        lateinit var apiImages: List<ApiPicture>
+        lateinit var images: MutableList<Picture>
 
         @JvmStatic
         fun newInstance(): ListView {
@@ -64,12 +87,18 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
                 arguments = Bundle().apply {
                     putInt(ARG_SECTION_NUMBER, 1)
                 }
+
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        Categories.updateCategories()
+                    }
+                }
             }
         }
     }
 
-    override fun onPictureSelected(s: String?) {
-        Toast.makeText(context,"Not yet implemented!", Toast.LENGTH_SHORT).show()
-        //TODO("Not yet implemented")
+    override fun onPictureSelected(item: Int?) {
+        pictureSelected = item
+        startActivity(Intent(context, ViewPicture::class.java))
     }
 }
