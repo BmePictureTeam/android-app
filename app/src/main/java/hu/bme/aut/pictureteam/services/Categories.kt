@@ -9,7 +9,7 @@ object Categories {
     var categories: List<Category> = listOf()
 
     suspend fun updateCategories() {
-        categories = Api.create().getCategories().categories
+        categories = Api.getInstance().getCategories().categories
 
         for (c in categories) {
             categoryIdToTitle[c.id] = c.name

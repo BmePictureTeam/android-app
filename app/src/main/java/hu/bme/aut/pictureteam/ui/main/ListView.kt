@@ -46,7 +46,7 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
         root.btnSearch.setOnClickListener {
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
-                    apiImages = Api.create().getPictures().pictures
+                    apiImages = Api.getInstance().getPictures().pictures
                     for (p in apiImages) {
                         val pic = Picture(null, p.title, mutableListOf(), p.description, "")
                         //TODO: képet be kéne állítani/letölteni: getpicture

@@ -17,15 +17,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
 import hu.bme.aut.pictureteam.MainActivity
 import hu.bme.aut.pictureteam.R
+import hu.bme.aut.pictureteam.services.Api
+import hu.bme.aut.pictureteam.services.ApiCreateImageRequestBody
+import hu.bme.aut.pictureteam.services.Categories.updateCategories
+import kotlinx.android.synthetic.main.detailed_view.*
 import kotlinx.android.synthetic.main.detailed_view.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.nio.ByteBuffer
 
 
 class UploadView : Fragment() {
@@ -57,10 +70,51 @@ class UploadView : Fragment() {
 
         root.btnUpload.setOnClickListener {
             if (selectedImage == null) {
+                Toast.makeText(context, "Please select an image.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
+            val title = tilName.editText?.text?.toString()
 
+            if (title.isNullOrEmpty()) {
+                Toast.makeText(context, "Name is required!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            lifecycleScope.launch {
+
+                withContext(Dispatchers.IO) {
+                    updateCategories()
+                    val id = Api
+                        .getInstance()
+                        .createImage(
+                            ApiCreateImageRequestBody(
+                                listOf(),
+                                "",
+                                title
+                            )
+                        ).id
+
+                    val size: Int = selectedImage!!.rowBytes * selectedImage!!.height
+                    val byteBuffer: ByteBuffer = ByteBuffer.allocate(size)
+                    selectedImage!!.copyPixelsToBuffer(byteBuffer)
+                    val byteArray = byteBuffer.array()
+
+                    val part = MultipartBody.Part.createFormData(
+                        "image",
+                        "image.png",
+                        RequestBody.create(MediaType.parse("image/*"), byteArray)
+                    )
+
+                    val res = Api.getInstance().uploadImage(id, part)
+                    if (res.code() != 204) {
+                        Toast.makeText(context, "Upload failed ${res.errorBody().toString()}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Upload succeeded", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+            }
         }
         uploadbtn = root.btnUpload
 

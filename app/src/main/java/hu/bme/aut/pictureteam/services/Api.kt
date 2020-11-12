@@ -2,7 +2,10 @@ package hu.bme.aut.pictureteam.services
 
 import hu.bme.aut.pictureteam.models.ApiPicture
 import hu.bme.aut.pictureteam.models.Category
+import okhttp3.Interceptor
 import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
@@ -21,7 +24,23 @@ data class ApiCreateImageRequestBody(
     val title: String
 )
 
+data class ApiCreateImageResponse(
+    val id: String
+)
+
+data class ApiLoginBody(
+    val email: String,
+    val password: String
+)
+
+data class ApiLoginResponse(
+    val token: String
+)
+
 interface Api {
+    @POST("/auth/login")
+    suspend fun login(@Body login: ApiLoginBody): ApiLoginResponse
+
     @GET("/images")
     suspend fun getPictures(
         @Query("offset") offset: Int = 0,
@@ -35,31 +54,70 @@ interface Api {
     @GET("/images/{id}")
     suspend fun getPicture(
         @Path("id") id: String
-    )
+    ) // TODO
 
     @POST("/images")
     suspend fun createImage(
         @Body body: ApiCreateImageRequestBody
-    )
+    ): ApiCreateImageResponse
 
     @Multipart
     @POST("/images/{id}")
     suspend fun uploadImage(
         @Path("id") id: String,
         @Part image: MultipartBody.Part
-    )
+    ): retrofit2.Response<Unit>
 
     companion object {
         private const val URL: String = "https://api.temalab.cicum.icu"
+        private var api: Api? = null
 
-        fun create(): Api {
-            val retrofit = Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl(URL)
+        fun getInstance(): Api {
+            if (api == null) {
+                createApi()
+            }
+            return api as Api
+        }
+
+        fun setToken(token: String) {
+            createApi(token)
+        }
+
+        private fun createApi(token: String? = null) {
+            val client = OkHttpClient.Builder()
+                .addInterceptor(ServiceInterceptor(token))
                 .build()
 
-            return retrofit.create(Api::class.java)
+            val retrofitBuilder = Retrofit.Builder()
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(URL)
+
+            api = retrofitBuilder.build().create(Api::class.java)
         }
     }
 }
 
+class ServiceInterceptor(
+    private val token : String? = null
+) : Interceptor {
+
+    override fun intercept(chain: Interceptor.Chain): Response {
+        var request = chain.request()
+
+        if(request.header("No-Authentication")==null){
+            //val token = getTokenFromSharedPreference();
+            //or use Token Function
+            if(!token.isNullOrEmpty())
+            {
+                val finalToken = "Bearer $token"
+                request = request.newBuilder()
+                    .addHeader("Authorization",finalToken)
+                    .build()
+            }
+        }
+
+        return chain.proceed(request)
+    }
+
+}

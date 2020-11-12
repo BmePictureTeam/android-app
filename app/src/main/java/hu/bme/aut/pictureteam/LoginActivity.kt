@@ -1,9 +1,15 @@
 package hu.bme.aut.pictureteam
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import hu.bme.aut.pictureteam.services.Api
+import hu.bme.aut.pictureteam.services.ApiLoginBody
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +32,19 @@ class LoginActivity : AppCompatActivity() {
                 etPassword.error = "Please enter your password"
             }
             else {
-                startActivity(Intent(this, MainActivity::class.java))
+                val ctx = this
+
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO)  {
+
+                        val token = Api.getInstance()
+                            .login(ApiLoginBody(etEmailAddress.text.toString(), etPassword.text.toString())).token
+
+                        Api.setToken(token)
+                    }
+
+                    startActivity(Intent(ctx, MainActivity::class.java))
+                }
             }
         }
     }
