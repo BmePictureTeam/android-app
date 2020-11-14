@@ -29,6 +29,7 @@ import hu.bme.aut.pictureteam.MainActivity
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.services.Api
 import hu.bme.aut.pictureteam.services.ApiCreateImageRequestBody
+import hu.bme.aut.pictureteam.services.Categories.titleToCategoryId
 import hu.bme.aut.pictureteam.services.Categories.updateCategories
 import kotlinx.android.synthetic.main.detailed_view.*
 import kotlinx.android.synthetic.main.detailed_view.view.*
@@ -39,7 +40,7 @@ import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.nio.ByteBuffer
-
+import java.util.*
 
 class UploadView : Fragment() {
     private lateinit var imgbtn: ImageButton
@@ -82,15 +83,22 @@ class UploadView : Fragment() {
             }
 
             lifecycleScope.launch {
-
                 withContext(Dispatchers.IO) {
                     updateCategories()
+                    val categoryNames =
+                        tilCategory.editText!!.text.toString().toLowerCase(Locale.getDefault())
+                            .split(",").toList()
+                    val categoryIds = mutableListOf<String>()
+                    for (name in categoryNames) {
+                        titleToCategoryId[name]?.let { it1 -> categoryIds.add(it1) }
+                    }
+
                     val id = Api
                         .getInstance()
                         .createImage(
                             ApiCreateImageRequestBody(
-                                listOf(),
-                                "",
+                                categoryIds,
+                                tilDescription.editText?.text.toString(),
                                 title
                             )
                         ).id
@@ -107,11 +115,19 @@ class UploadView : Fragment() {
                     )
 
                     val res = Api.getInstance().uploadImage(id, part)
+
+                    //TODO: ezen a threaden nem lehet toast-olni
+/*
                     if (res.code() != 204) {
                         Toast.makeText(context, "Upload failed ${res.errorBody().toString()}", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(context, "Upload succeeded", Toast.LENGTH_SHORT).show()
+                        tilName.editText?.text?.clear()
+                        tilCategory.editText?.text?.clear()
+                        tilDate.editText?.text?.clear()
+                        tilDescription.editText?.text?.clear()
                     }
+*/
                 }
 
             }
