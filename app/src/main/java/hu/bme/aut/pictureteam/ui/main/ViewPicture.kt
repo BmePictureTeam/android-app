@@ -24,7 +24,7 @@ class ViewPicture : AppCompatActivity() {
     companion object {
         lateinit var pictureSelected: Picture
         fun newInstance() {
-            pictureSelected = ListView.pictures[ListView.pictureSelected!!]
+//            pictureSelected = ListView.pictures[ListView.pictureSelected!!]
         }
     }
 }

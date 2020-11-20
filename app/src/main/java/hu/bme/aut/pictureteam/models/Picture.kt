@@ -13,7 +13,7 @@ data class Picture(
 data class ApiPicture(
     val categories: List<String>,
     val date: String,
-    val description: String,
+    val description: String?,
     val id: String,
     val title: String
 )

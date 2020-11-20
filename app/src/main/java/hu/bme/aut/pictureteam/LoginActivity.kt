@@ -1,5 +1,6 @@
 package hu.bme.aut.pictureteam
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -13,42 +14,52 @@ import kotlinx.coroutines.withContext
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        try {
-            Thread.sleep(1000)
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
-        }
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        val sharedPref = getPreferences(Context.MODE_PRIVATE)
+
+        val storedToken = sharedPref.getString("token", null)
+
+        if (storedToken != null) {
+            Api.setToken(storedToken)
+            startActivity(Intent(this, MainActivity::class.java))
+        }
+
+
         btnLogin.setOnClickListener {
-            if (etEmailAddress.text.toString().isEmpty()) {
-                etEmailAddress.requestFocus()
-                etEmailAddress.error = "Please enter your email address"
-            }
-            else if (etPassword.text.toString().isEmpty()) {
-                etPassword.requestFocus()
-                etPassword.error = "Please enter your password"
-            }
-            else {
-                val ctx = this
+            when {
+                etEmailAddress.text.toString().isEmpty() -> {
+                    etEmailAddress.requestFocus()
+                    etEmailAddress.error = "Please enter your email address"
+                }
+                etPassword.text.toString().isEmpty() -> {
+                    etPassword.requestFocus()
+                    etPassword.error = "Please enter your password"
+                }
+                else -> {
+                    val ctx = this
 
-                lifecycleScope.launch {
-                    withContext(Dispatchers.IO)  {
+                    lifecycleScope.launch {
+                        withContext(Dispatchers.IO) {
 
-                        val token = Api.getInstance()
-                            .login(
-                                ApiLoginBody(
-                                    etEmailAddress.text.toString(),
-                                    etPassword.text.toString()
-                                )
-                            ).token
+                            val token = Api.getInstance()
+                                .login(
+                                    ApiLoginBody(
+                                        etEmailAddress.text.toString(),
+                                        etPassword.text.toString()
+                                    )
+                                ).token
 
-                        Api.setToken(token)
+                            Api.setToken(token)
+                            withContext(Dispatchers.Main) {
+                                sharedPref.edit().putString("token", token).commit()
+                            }
+                        }
+
+                        startActivity(Intent(ctx, MainActivity::class.java))
                     }
-
-                    startActivity(Intent(ctx, MainActivity::class.java))
                 }
             }
         }

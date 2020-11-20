@@ -37,6 +37,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.util.*
 
@@ -103,10 +104,11 @@ class UploadView : Fragment() {
                             )
                         ).id
 
-                    val size: Int = selectedImage!!.rowBytes * selectedImage!!.height
-                    val byteBuffer: ByteBuffer = ByteBuffer.allocate(size)
-                    selectedImage!!.copyPixelsToBuffer(byteBuffer)
-                    val byteArray = byteBuffer.array()
+                    val stream = ByteArrayOutputStream()
+                    selectedImage!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    stream.toByteArray()
+                    val byteArray = stream.toByteArray()
+                    selectedImage!!.recycle()
 
                     val part = MultipartBody.Part.createFormData(
                         "image",
@@ -118,7 +120,11 @@ class UploadView : Fragment() {
 
                     withContext(Dispatchers.Main) {
                         if (res.code() != 204) {
-                            Toast.makeText(context, "Upload failed ${res.errorBody().toString()}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Upload failed ${res.errorBody().toString()}",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         } else {
                             Toast.makeText(context, "Upload succeeded", Toast.LENGTH_SHORT).show()
                             imgbtnUpload.setImageResource(R.drawable.placeholder)

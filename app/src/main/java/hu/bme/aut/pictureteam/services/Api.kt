@@ -2,16 +2,13 @@ package hu.bme.aut.pictureteam.services
 
 import hu.bme.aut.pictureteam.models.ApiPicture
 import hu.bme.aut.pictureteam.models.Category
-import okhttp3.Interceptor
-import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.Response
+import okhttp3.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
 data class ApiSearchResponse (
-    val pictures: List<ApiPicture>
+    val images: List<ApiPicture>
 )
 
 data class ApiCategoriesResponse (
@@ -37,10 +34,6 @@ data class ApiLoginResponse(
     val token: String
 )
 
-data class ApiGetPictureResponse (
-    val picture: ByteArray
-)
-
 interface Api {
     @POST("/auth/login")
     suspend fun login(@Body login: ApiLoginBody): ApiLoginResponse
@@ -56,7 +49,7 @@ interface Api {
     suspend fun getCategories(): ApiCategoriesResponse
 
     @GET("/images/{id}")
-    suspend fun getPicture(@Path("id") id: String): ApiGetPictureResponse
+    suspend fun getPicture(@Path("id") id: String): ResponseBody
 
     @POST("/images")
     suspend fun createImage(@Body body: ApiCreateImageRequestBody): ApiCreateImageResponse

@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.row_item.view.*
 
 class PictureAdapter internal constructor(private val listener: OnPictureSelectedListener?) :
     RecyclerView.Adapter<PictureAdapter.PictureViewHolder>() {
-    private val pictures: MutableList<Picture>
+    private var pictures: MutableList<Picture>
 
     interface OnPictureSelectedListener {
         fun onPictureSelected(item: Int)
@@ -32,10 +32,19 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
         return pictures.size
     }
 
-    fun addItem(s: String) {
-        val p = Picture(null, s, mutableListOf(), "", "")
+    fun addPicture(p: Picture) {
         pictures.add(p)
         notifyItemInserted(pictures.size - 1)
+    }
+
+    fun setPictures(pictures: MutableList<Picture>) {
+        this.pictures = pictures
+        notifyDataSetChanged()
+    }
+
+    fun clear() {
+        pictures.clear()
+        notifyDataSetChanged()
     }
 
     inner class PictureViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
