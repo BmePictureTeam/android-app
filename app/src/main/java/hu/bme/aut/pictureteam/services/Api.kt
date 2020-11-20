@@ -10,7 +10,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
-data class ApiPicturesResponse (
+data class ApiSearchResponse (
     val pictures: List<ApiPicture>
 )
 
@@ -37,29 +37,29 @@ data class ApiLoginResponse(
     val token: String
 )
 
+data class ApiGetPictureResponse (
+    val picture: ByteArray
+)
+
 interface Api {
     @POST("/auth/login")
     suspend fun login(@Body login: ApiLoginBody): ApiLoginResponse
 
     @GET("/images")
-    suspend fun getPictures(
+    suspend fun searchPictures(
         @Query("offset") offset: Int = 0,
         @Query("limit") limit: Int = 10,
         @Query("search") search: String? = null
-    ): ApiPicturesResponse
+    ): ApiSearchResponse
 
     @GET("/categories")
     suspend fun getCategories(): ApiCategoriesResponse
 
     @GET("/images/{id}")
-    suspend fun getPicture(
-        @Path("id") id: String
-    ) // TODO
+    suspend fun getPicture(@Path("id") id: String): ApiGetPictureResponse
 
     @POST("/images")
-    suspend fun createImage(
-        @Body body: ApiCreateImageRequestBody
-    ): ApiCreateImageResponse
+    suspend fun createImage(@Body body: ApiCreateImageRequestBody): ApiCreateImageResponse
 
     @Multipart
     @POST("/images/{id}")

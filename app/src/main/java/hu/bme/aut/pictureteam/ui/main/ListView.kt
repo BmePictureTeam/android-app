@@ -1,6 +1,7 @@
 package hu.bme.aut.pictureteam.ui.main
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.models.ApiPicture
 import hu.bme.aut.pictureteam.models.Picture
 import hu.bme.aut.pictureteam.services.Api
+import hu.bme.aut.pictureteam.services.ApiSearchResponse
 import hu.bme.aut.pictureteam.services.Categories
 import hu.bme.aut.pictureteam.services.Categories.categoryIdToTitle
 import kotlinx.android.synthetic.main.list_view.view.*
@@ -46,14 +48,18 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
         root.btnSearch.setOnClickListener {
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
-                    apiImages = Api.getInstance().getPictures().pictures
+                    val api: Api = Api.getInstance()
+                    val gp: ApiSearchResponse = api.searchPictures()
+                    apiImages = gp.pictures
                     for (p in apiImages) {
-                        val pic = Picture(null, p.title, mutableListOf(), p.description, "")
-                        //TODO: képet be kéne állítani/letölteni: getpicture
+                        //képet beállít
+                        val res = Api.getInstance().getPicture(p.id).picture
+                        val bitmap = BitmapFactory.decodeByteArray(res, 0, res.size)
+                        val pic = Picture(bitmap, p.title, mutableListOf(), p.description, "")
                         for (c in p.categories) {
                             categoryIdToTitle[c]?.let { it1 -> pic.categories.add(it1) }
                         }
-                        images.add(pic)
+                        pictures.add(pic)
                     }
                 }
             }
@@ -67,10 +73,12 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
     private fun initRecyclerView() {
         root.recyclerview.layoutManager = LinearLayoutManager(context)
         adapter = PictureAdapter(this)
+/*
         adapter.addItem("Macska")
         adapter.addItem("Cica")
         adapter.addItem("Kutya")
         adapter.addItem("Glaucus Atlanticus")
+*/
         root.recyclerview.adapter = adapter
     }
 
@@ -79,7 +87,7 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
         var pictureSelected: Int? = null
 
         lateinit var apiImages: List<ApiPicture>
-        lateinit var images: MutableList<Picture>
+        var pictures: MutableList<Picture> = mutableListOf()
 
         @JvmStatic
         fun newInstance(): ListView {
@@ -97,7 +105,7 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
         }
     }
 
-    override fun onPictureSelected(item: Int?) {
+    override fun onPictureSelected(item: Int) {
         pictureSelected = item
         startActivity(Intent(context, ViewPicture::class.java))
     }

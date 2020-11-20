@@ -13,7 +13,7 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
     private val pictures: MutableList<Picture>
 
     interface OnPictureSelectedListener {
-        fun onPictureSelected(item: Int?)
+        fun onPictureSelected(item: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PictureViewHolder {
@@ -42,7 +42,7 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
         val picture = itemView.row_image
         val nameTextView = itemView.row_item_name
         val categoryTextView = itemView.row_item_name
-        var item: Int? = null
+        var item: Int = 0
 
         init {
             itemView.setOnClickListener { listener?.onPictureSelected(item) }

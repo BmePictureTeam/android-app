@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import hu.bme.aut.pictureteam.R
+import hu.bme.aut.pictureteam.models.Picture
 import kotlinx.android.synthetic.main.detailed_view.*
 
 class ViewPicture : AppCompatActivity() {
@@ -13,12 +14,17 @@ class ViewPicture : AppCompatActivity() {
         btnUpload.visibility = View.GONE
         imgbtnUpload.isEnabled = false
 
-        val pictureSelected = ListView.images[ListView.pictureSelected!!]
-
         tilName.editText?.keyListener = null
         tilName.editText?.setText(pictureSelected.name)
         tilDescription.editText?.setText(pictureSelected.description)
         tilDate.editText?.setText(pictureSelected.date)
 
+    }
+
+    companion object {
+        lateinit var pictureSelected: Picture
+        fun newInstance() {
+            pictureSelected = ListView.pictures[ListView.pictureSelected!!]
+        }
     }
 }

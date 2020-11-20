@@ -38,7 +38,12 @@ class LoginActivity : AppCompatActivity() {
                     withContext(Dispatchers.IO)  {
 
                         val token = Api.getInstance()
-                            .login(ApiLoginBody(etEmailAddress.text.toString(), etPassword.text.toString())).token
+                            .login(
+                                ApiLoginBody(
+                                    etEmailAddress.text.toString(),
+                                    etPassword.text.toString()
+                                )
+                            ).token
 
                         Api.setToken(token)
                     }

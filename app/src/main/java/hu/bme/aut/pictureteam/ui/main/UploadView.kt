@@ -3,7 +3,6 @@ package hu.bme.aut.pictureteam.ui.main
 import android.Manifest
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
@@ -22,7 +21,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import hu.bme.aut.pictureteam.MainActivity
@@ -61,8 +59,10 @@ class UploadView : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.detailed_view, container, false)
-        pageViewModel.text.observe(viewLifecycleOwner, Observer<String> {
+        pageViewModel.text.observe(viewLifecycleOwner, {
         })
+
+        root.tilDate.visibility = View.GONE
 
         root.imgbtnUpload.setOnClickListener {
             context?.let { it1 -> selectImage(it1) }
@@ -116,20 +116,18 @@ class UploadView : Fragment() {
 
                     val res = Api.getInstance().uploadImage(id, part)
 
-                    //TODO: ezen a threaden nem lehet toast-olni
-/*
-                    if (res.code() != 204) {
-                        Toast.makeText(context, "Upload failed ${res.errorBody().toString()}", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "Upload succeeded", Toast.LENGTH_SHORT).show()
-                        tilName.editText?.text?.clear()
-                        tilCategory.editText?.text?.clear()
-                        tilDate.editText?.text?.clear()
-                        tilDescription.editText?.text?.clear()
+                    withContext(Dispatchers.Main) {
+                        if (res.code() != 204) {
+                            Toast.makeText(context, "Upload failed ${res.errorBody().toString()}", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Upload succeeded", Toast.LENGTH_SHORT).show()
+                            imgbtnUpload.setImageResource(R.drawable.placeholder)
+                            tilName.editText?.text?.clear()
+                            tilCategory.editText?.text?.clear()
+                            tilDescription.editText?.text?.clear()
+                        }
                     }
-*/
                 }
-
             }
         }
         uploadbtn = root.btnUpload
@@ -155,19 +153,23 @@ class UploadView : Fragment() {
         val options = arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
         builder.setTitle("Choose picture to upload")
-        builder.setItems(options, DialogInterface.OnClickListener { dialog, item ->
-            if (options[item] == "Take Photo") {
-                val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                startActivityForResult(takePicture, 0)
-            } else if (options[item] == "Choose from Gallery") {
-                verifyStoragePermissions(mainActivity)
-                val pickPhoto =
-                    Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                startActivityForResult(pickPhoto, 1)
-            } else if (options[item] == "Cancel") {
-                dialog.dismiss()
+        builder.setItems(options) { dialog, item ->
+            when {
+                options[item] == "Take Photo" -> {
+                    val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    startActivityForResult(takePicture, 0)
+                }
+                options[item] == "Choose from Gallery" -> {
+                    verifyStoragePermissions(mainActivity)
+                    val pickPhoto =
+                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    startActivityForResult(pickPhoto, 1)
+                }
+                options[item] == "Cancel" -> {
+                    dialog.dismiss()
+                }
             }
-        })
+        }
         builder.show()
     }
 
@@ -213,7 +215,7 @@ class UploadView : Fragment() {
      *
      * If the app does not has permission then the user will be prompted to grant permissions
      */
-    fun verifyStoragePermissions(activity: Activity?) {
+    private fun verifyStoragePermissions(activity: Activity?) {
         // Check if we have write permission
         val permission = ActivityCompat.checkSelfPermission(
             activity!!,

@@ -1,9 +1,9 @@
 package hu.bme.aut.pictureteam.models
 
-import android.media.Image
+import android.graphics.Bitmap
 
 data class Picture(
-    val image: Image?,
+    val image: Bitmap?,
     val name: String,
     val categories: MutableList<String>,
     val description: String,
@@ -12,9 +12,10 @@ data class Picture(
 
 data class ApiPicture(
     val categories: List<String>,
+    val date: String,
     val description: String,
-    val title: String,
-    val id: String
+    val id: String,
+    val title: String
 )
 
 /*
