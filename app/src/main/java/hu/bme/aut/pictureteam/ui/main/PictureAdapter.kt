@@ -1,6 +1,5 @@
 package hu.bme.aut.pictureteam.ui.main
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,7 +50,8 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
     ) : RecyclerView.ViewHolder(itemView) {
         fun setPicture(pos: Int, picture: Picture) {
             itemView.row_image.setImageBitmap(picture.image)
-            // TODO: text, categories, etc.
+            itemView.row_item_name.text = picture.name
+            itemView.row_item_category.text = picture.categoriesToString()
             itemView.setOnClickListener { listener?.onPictureSelected(pos) }
         }
     }

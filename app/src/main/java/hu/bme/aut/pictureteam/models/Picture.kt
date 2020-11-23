@@ -8,7 +8,16 @@ data class Picture(
     val categories: MutableList<String>,
     val description: String,
     val date: String
-)
+){
+    fun categoriesToString(): String {
+        var rv = ""
+        for (category in categories) {
+            rv += category
+        }
+
+        return rv
+    }
+}
 
 data class ApiPicture(
     val categories: List<String>,
