@@ -11,8 +11,10 @@ data class Picture(
 ){
     fun categoriesToString(): String {
         var rv = ""
+
         for (category in categories) {
             rv += category
+            rv += " "
         }
 
         return rv

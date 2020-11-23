@@ -3,7 +3,6 @@ package hu.bme.aut.pictureteam.ui.main
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,10 +12,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.bme.aut.pictureteam.R
-import hu.bme.aut.pictureteam.models.ApiPicture
 import hu.bme.aut.pictureteam.models.Picture
 import hu.bme.aut.pictureteam.services.Api
-import hu.bme.aut.pictureteam.services.ApiSearchResponse
 import hu.bme.aut.pictureteam.services.Categories
 import hu.bme.aut.pictureteam.services.Categories.categoryIdToTitle
 import kotlinx.android.synthetic.main.list_view.view.*
@@ -24,7 +21,6 @@ import kotlinx.android.synthetic.main.recycler_view.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
     private lateinit var pageViewModel: PageViewModel
@@ -41,10 +37,9 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         root = inflater.inflate(R.layout.list_view, container, false)
         pageViewModel.text.observe(viewLifecycleOwner, Observer<String> {
-//            textView.text = it
         })
 
         root.btnSearch.setOnClickListener {
@@ -58,10 +53,13 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
                         val bitmap = BitmapFactory.decodeStream(resBytes)
 
                         Picture(
-                            bitmap, it.title,
+                            bitmap,
+                            it.title,
                             it.categories.map {
                                 categoryIdToTitle[it]!!
-                            }.toMutableList(), it.description ?: "", ""
+                            }.toMutableList(),
+                            it.description ?: "",
+                            ""
                         )
                     }
 
