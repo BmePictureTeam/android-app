@@ -11,22 +11,35 @@ import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
 
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
 
         val storedToken = sharedPref.getString("token", null)
 
         if (storedToken != null) {
-            Api.setToken(storedToken)
-            startActivity(Intent(this, MainActivity::class.java))
+            val ctx = this
+            lifecycleScope.launch(Dispatchers.IO) {
+                Api.setToken(storedToken)
+                try {
+                    Api.getInstance().searchPictures(0, 0)
+
+                    withContext(Dispatchers.Main) {
+                        startActivity(Intent(ctx, MainActivity::class.java))
+                    }
+                } catch (e: Exception) {
+                    Api.setToken(null)
+                }
+            }
         }
 
+
+        setContentView(R.layout.activity_login)
 
         btnLogin.setOnClickListener {
             when {

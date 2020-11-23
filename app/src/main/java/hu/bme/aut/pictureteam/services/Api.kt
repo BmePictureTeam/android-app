@@ -72,7 +72,7 @@ interface Api {
             return api as Api
         }
 
-        fun setToken(token: String) {
+        fun setToken(token: String?) {
             createApi(token)
         }
 
