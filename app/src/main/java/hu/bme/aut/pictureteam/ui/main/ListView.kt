@@ -1,7 +1,6 @@
 package hu.bme.aut.pictureteam.ui.main
 
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,10 +11,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.bme.aut.pictureteam.R
-import hu.bme.aut.pictureteam.models.Picture
-import hu.bme.aut.pictureteam.services.Api
 import hu.bme.aut.pictureteam.services.Categories
-import hu.bme.aut.pictureteam.services.Categories.categoryIdToTitle
+import hu.bme.aut.pictureteam.services.Interactions
 import kotlinx.android.synthetic.main.list_view.view.*
 import kotlinx.android.synthetic.main.recycler_view.view.*
 import kotlinx.coroutines.Dispatchers
@@ -44,29 +41,8 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
 
         root.btnSearch.setOnClickListener {
             lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    val api: Api = Api.getInstance()
-
-                    val images = api.searchPictures().images.map {
-                        val resBody = Api.getInstance().getPicture(it.id)
-                        val resBytes = resBody.byteStream()
-                        val bitmap = BitmapFactory.decodeStream(resBytes)
-
-                        Picture(
-                            bitmap,
-                            it.title,
-                            it.categories.map {
-                                categoryIdToTitle[it]!!
-                            }.toMutableList(),
-                            it.description ?: "",
-                            ""
-                        )
-                    }
-
-                    withContext(Dispatchers.Main) {
-                        adapter.setPictures(images.toMutableList())
-                    }
-                }
+                val images = Interactions.search(adapter)
+                adapter.setPictures(images.toMutableList())
             }
         }
 

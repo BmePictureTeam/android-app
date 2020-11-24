@@ -50,7 +50,7 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
     ) : RecyclerView.ViewHolder(itemView) {
         fun setPicture(pos: Int, picture: Picture) {
             itemView.row_image.setImageBitmap(picture.image)
-            itemView.row_item_name.text = picture.name
+            itemView.row_item_name.text = picture.title
             itemView.row_item_category.text = picture.categoriesToString()
             itemView.setOnClickListener { listener?.onPictureSelected(pos) }
         }

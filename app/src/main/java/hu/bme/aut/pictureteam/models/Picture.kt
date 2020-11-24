@@ -4,10 +4,10 @@ import android.graphics.Bitmap
 
 data class Picture(
     val image: Bitmap?,
-    val name: String,
+    val title: String?,
     val categories: MutableList<String>,
     val description: String,
-    val date: String
+    val date: String?
 ){
     fun categoriesToString(): String {
         var rv = ""

@@ -15,7 +15,7 @@ class ViewPicture : AppCompatActivity() {
         imgbtnUpload.isEnabled = false
 
         tilName.editText?.keyListener = null
-        tilName.editText?.setText(pictureSelected.name)
+        tilName.editText?.setText(pictureSelected.title)
         tilDescription.editText?.setText(pictureSelected.description)
         tilDate.editText?.setText(pictureSelected.date)
 
