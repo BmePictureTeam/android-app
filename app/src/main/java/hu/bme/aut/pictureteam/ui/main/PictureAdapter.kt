@@ -3,6 +3,7 @@ package hu.bme.aut.pictureteam.ui.main
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.scale
 import androidx.recyclerview.widget.RecyclerView
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.models.Picture
@@ -51,7 +52,7 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
         fun setPicture(pos: Int, picture: Picture) {
-            itemView.row_image.setImageBitmap(picture.image)
+            itemView.row_image.setImageBitmap(picture.image?.scale(128, 128))
             itemView.row_item_name.text = picture.title
             itemView.row_item_categories.text =
                 formatList(

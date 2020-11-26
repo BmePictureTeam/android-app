@@ -26,8 +26,10 @@ import hu.bme.aut.pictureteam.services.PictureInteractions
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.image_detail_view.*
 import kotlinx.android.synthetic.main.image_detail_view.view.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class UploadView : Fragment() {
@@ -72,7 +74,10 @@ class UploadView : Fragment() {
 
             lifecycleScope.launch {
                 val toastMessage = try {
-                    PictureInteractions.upload(picture)
+                    root.btnUpload.startAnimation()
+                    withContext(Dispatchers.IO) {
+                        PictureInteractions.upload(picture)
+                    }
                     imgbtnUpload.setImageResource(R.drawable.placeholder)
                     tilName.editText?.text?.clear()
                     tilCategory.editText?.text?.clear()
@@ -80,6 +85,8 @@ class UploadView : Fragment() {
                     "Upload succeeded"
                 } catch (e: Exception) {
                     "Upload failed: ${e.message}"
+                } finally {
+                    root.btnUpload.revertAnimation();
                 }
 
                 Toast.makeText(
@@ -200,10 +207,10 @@ class UploadView : Fragment() {
     }
 
     // Storage Permissions
-    private val REQUEST_EXTERNAL_STORAGE = 1
-    private val PERMISSIONS_STORAGE = arrayOf<String>(
+    private val permissionCodes = arrayOf<String>(
         Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.CAMERA
     )
 
     /**
@@ -213,8 +220,8 @@ class UploadView : Fragment() {
      */
     private suspend fun requestPermissions(): Boolean {
         requestPermissions(
-            PERMISSIONS_STORAGE,
-            REQUEST_EXTERNAL_STORAGE
+            permissionCodes,
+            1
         )
 
         return permissionResults.receive()

@@ -8,19 +8,21 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.HttpException
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.InputStream
 
 class UploadException(msg: String) : Exception(msg)
 
 object PictureInteractions {
-    suspend fun search(): List<Picture> {
+    var cacheDir: File? = null
+
+    suspend fun search(offset: Int? = 0, text: String? = null): List<Picture> {
         val images: List<Picture>
 
         val api: Api = Api.getInstance()
 
-        images = api.searchPictures().images.map { pic ->
-            val resBody = Api.getInstance().downloadPicture(pic.id)
-            val resBytes = resBody.byteStream()
-            val bitmap = BitmapFactory.decodeStream(resBytes)
+        images = api.searchPictures(offset ?: 0, 10, search = text).images.map { pic ->
+            val bitmap = BitmapFactory.decodeStream(getImage(pic.id))
 
             val rating = Api.getInstance().getPictureRating(pic.id)
 
@@ -58,7 +60,6 @@ object PictureInteractions {
         picture.image!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
         stream.toByteArray()
         val byteArray = stream.toByteArray()
-        picture.image.recycle()
 
         val part = MultipartBody.Part.createFormData(
             "image",
@@ -99,5 +100,30 @@ object PictureInteractions {
 
             throw e
         }
+    }
+
+    /**
+     * Retrieves the image either from local file cache or
+     * from the API.
+     */
+    private suspend fun getImage(id: String): InputStream {
+        val localImage = cacheDir?.resolve(id)
+        if (localImage != null) {
+            try {
+                return localImage.inputStream()
+            } catch(e: Exception) {
+                // Not found locally, can be ignored.
+            }
+        }
+
+        var imageStream = Api.getInstance().downloadPicture(id).byteStream()
+
+        // Save it, and serve it from file.
+        if (localImage != null) {
+            imageStream.copyTo(localImage.outputStream())
+            imageStream = localImage.inputStream()
+        }
+
+        return imageStream
     }
 }

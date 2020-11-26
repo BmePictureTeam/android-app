@@ -41,18 +41,27 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
 
         initRecyclerView()
 
-        root.btnSearch.setOnClickListener {
-            lifecycleScope.launch {
-                val images = PictureInteractions.search()
-                adapter.setPictures(images.toMutableList())
-            }
-        }
+        root.btnSearch.setOnClickListener { updateImages() }
+
+//        updateImages()
 
         return root
     }
 
+    private fun updateImages() {
+        root.image_refresh.isRefreshing = true
+        lifecycleScope.launch(Dispatchers.IO) {
+            val images = PictureInteractions.search(0,null)
+            withContext(Dispatchers.Main) {
+                adapter.setPictures(images.toMutableList())
+                root.image_refresh.isRefreshing = false
+            }
+        }
+    }
+
     private fun initRecyclerView() {
         root.recyclerview.layoutManager = LinearLayoutManager(context)
+        root.image_refresh.setOnRefreshListener(::updateImages)
         adapter = PictureAdapter(this)
         root.recyclerview.adapter = adapter
     }
