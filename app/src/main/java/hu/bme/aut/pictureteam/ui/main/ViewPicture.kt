@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.detailed_view.*
 class ViewPicture : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.detailed_view)
+        setContentView(R.layout.image_detail_view)
         btnUpload.visibility = View.GONE
         imgbtnUpload.isEnabled = false
 

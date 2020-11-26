@@ -20,7 +20,7 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PictureViewHolder {
         val view: View =
-            LayoutInflater.from(parent.context).inflate(R.layout.row_item, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.image_row, parent, false)
         return PictureViewHolder(view)
     }
 

@@ -35,7 +35,7 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        root = inflater.inflate(R.layout.list_view, container, false)
+        root = inflater.inflate(R.layout.image_list_tab, container, false)
         pageViewModel.text.observe(viewLifecycleOwner, Observer<String> {
         })
 

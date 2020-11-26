@@ -48,7 +48,7 @@ class UploadView : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.detailed_view, container, false)
+        val root = inflater.inflate(R.layout.image_detail_view, container, false)
         pageViewModel.text.observe(viewLifecycleOwner, {
         })
 
