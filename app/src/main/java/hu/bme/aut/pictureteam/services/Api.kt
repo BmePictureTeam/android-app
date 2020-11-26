@@ -7,11 +7,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
-data class ApiSearchResponse (
+data class ApiSearchResponse(
     val images: List<ApiPicture>
 )
 
-data class ApiCategoriesResponse (
+data class ApiCategoriesResponse(
     val categories: List<Category>
 )
 
@@ -34,6 +34,11 @@ data class ApiLoginResponse(
     val token: String
 )
 
+data class ApiPictureRatingResponse(
+    val average: Float,
+    val rating_count: Int
+)
+
 interface Api {
     @POST("/auth/login")
     suspend fun login(@Body login: ApiLoginBody): ApiLoginResponse
@@ -52,14 +57,17 @@ interface Api {
     suspend fun getPicture(@Path("id") id: String): ResponseBody
 
     @POST("/images")
-    suspend fun createImage(@Body body: ApiCreateImageRequestBody): ApiCreateImageResponse
+    suspend fun createPicture(@Body body: ApiCreateImageRequestBody): ApiCreateImageResponse
 
     @Multipart
     @POST("/images/{id}")
-    suspend fun uploadImage(
+    suspend fun uploadPicture(
         @Path("id") id: String,
         @Part image: MultipartBody.Part
     ): retrofit2.Response<Unit>
+
+    @GET("/images/{id}/rating")
+    suspend fun getPictureRating(@Path("id") id: String): ApiPictureRatingResponse
 
     companion object {
         private const val URL: String = "https://api.temalab.cicum.icu"
@@ -92,20 +100,19 @@ interface Api {
 }
 
 class ServiceInterceptor(
-    private val token : String? = null
+    private val token: String? = null
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
 
-        if(request.header("No-Authentication")==null){
+        if (request.header("No-Authentication") == null) {
             //val token = getTokenFromSharedPreference();
             //or use Token Function
-            if(!token.isNullOrEmpty())
-            {
+            if (!token.isNullOrEmpty()) {
                 val finalToken = "Bearer $token"
                 request = request.newBuilder()
-                    .addHeader("Authorization",finalToken)
+                    .addHeader("Authorization", finalToken)
                     .build()
             }
         }

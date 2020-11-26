@@ -66,17 +66,10 @@ class UploadView : Fragment() {
                 return@setOnClickListener
             }
 
-            val categoryNames =
-                tilCategory.editText!!.text.toString().toLowerCase(Locale.getDefault())
-                    .split(",").toList()
-            val categoryIds = mutableListOf<String>()
-            for (name in categoryNames) {
-                Categories.titleToCategoryId[name]?.let { it1 -> categoryIds.add(it1) }
-            }
-
             val description = tilDescription.editText?.text.toString()
 
-            val picture = Picture(selectedImage, title, categoryIds, description, null)
+            // TODO categories
+            val picture = Picture(title!!, description, mutableListOf(), selectedImage)
 
             lifecycleScope.launch {
                 val toastMessage = try {
@@ -160,7 +153,8 @@ class UploadView : Fragment() {
                 options[item] == "Choose from Gallery" -> {
                     lifecycleScope.launch {
                         if (!requestPermissions()) {
-                            Toast.makeText(context, "Please grant permissions.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Please grant permissions.", Toast.LENGTH_SHORT)
+                                .show()
                             return@launch
                         }
                         val pickPhoto =

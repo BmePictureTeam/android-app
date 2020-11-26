@@ -1,19 +1,23 @@
 package hu.bme.aut.pictureteam.services
 
 import hu.bme.aut.pictureteam.models.Category
-import java.util.*
+import kotlin.collections.HashMap
 
 object Categories {
-    val categoryIdToTitle = hashMapOf<String, String>()
-    val titleToCategoryId = hashMapOf<String, String>()
+    private val categoryNames: HashMap<String, String> = hashMapOf()
+
     var categories: List<Category> = listOf()
+        private set
+
+    fun categoryName(id: String): String? {
+        return categoryNames[id]
+    }
 
     suspend fun updateCategories() {
         categories = Api.getInstance().getCategories().categories
 
         for (c in categories) {
-            categoryIdToTitle[c.id] = c.name
-            titleToCategoryId[c.name.toLowerCase(Locale.getDefault())] = c.id
+            categoryNames[c.id] = c.name
         }
     }
 }

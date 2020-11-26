@@ -42,8 +42,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
 
-    <include
-        layout="@layout/recycler_view"/>
+        <include layout="@layout/recycler_view" />
 
     </LinearLayout>
 

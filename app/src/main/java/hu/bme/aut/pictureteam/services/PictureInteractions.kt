@@ -8,7 +8,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.ByteArrayOutputStream
 
-class UploadException(msg: String): Exception(msg)
+class UploadException(msg: String) : Exception(msg)
 
 object PictureInteractions {
     suspend fun search(): List<Picture> {
@@ -16,19 +16,22 @@ object PictureInteractions {
 
         val api: Api = Api.getInstance()
 
-        images = api.searchPictures().images.map {
-            val resBody = Api.getInstance().getPicture(it.id)
+        images = api.searchPictures().images.map { pic ->
+            val resBody = Api.getInstance().getPicture(pic.id)
             val resBytes = resBody.byteStream()
             val bitmap = BitmapFactory.decodeStream(resBytes)
 
+            val rating = Api.getInstance().getPictureRating(pic.id)
+
             Picture(
-                bitmap,
-                it.title,
-                it.categories.map {
-                    Categories.categoryIdToTitle[it]!!
-                }.toMutableList(),
-                it.description ?: "",
-                ""
+                title = pic.title,
+                id = pic.id,
+                image = bitmap,
+                categories = pic.categories.toMutableList(),
+                description = pic.description ?: "",
+                date = pic.date,
+                rating = rating.average,
+                ratingCount = rating.rating_count
             )
         }
 
@@ -42,7 +45,7 @@ object PictureInteractions {
 
         val id = Api
             .getInstance()
-            .createImage(
+            .createPicture(
                 ApiCreateImageRequestBody(
                     picture.categories,
                     picture.description,
@@ -62,7 +65,7 @@ object PictureInteractions {
             RequestBody.create(MediaType.parse("image/*"), byteArray)
         )
 
-        res = Api.getInstance().uploadImage(id, part)
+        res = Api.getInstance().uploadPicture(id, part)
 
         if (res.code() != 204) {
             throw UploadException(res.errorBody().toString())

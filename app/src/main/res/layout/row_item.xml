@@ -1,36 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/row_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="4dp"
-    android:id="@+id/row_item">
+    android:padding="4dp">
 
     <ImageView
         android:id="@+id/row_image"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/placeholder"/>
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/placeholder"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+
+    <TextView
+        android:id="@+id/row_item_name"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:orientation="horizontal">
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/row_image"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Name" />
 
-        <TextView
-            android:id="@+id/row_item_name"
-            android:layout_width="130dp"
-            android:layout_height="wrap_content"
-            tools:text="Name" />
+    <RatingBar
+        android:id="@+id/row_image_rating"
+        style="?android:attr/ratingBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="10dp"
+        android:isIndicator="true"
+        android:numStars="5"
+        android:stepSize="0.5"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/row_item_category"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="Category" />
-    </LinearLayout>
-</LinearLayout>
+    <TextView
+        android:id="@+id/row_item_categories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
+        android:textSize="12sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:text="Category" />
+</androidx.constraintlayout.widget.ConstraintLayout>
