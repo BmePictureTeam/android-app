@@ -5,7 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.models.Picture
-import kotlinx.android.synthetic.main.detailed_view.*
+import kotlinx.android.synthetic.main.image_detail_view.*
 
 class ViewPicture : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

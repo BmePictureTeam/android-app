@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.services.Categories
 import hu.bme.aut.pictureteam.services.PictureInteractions
-import kotlinx.android.synthetic.main.list_view.view.*
-import kotlinx.android.synthetic.main.recycler_view.view.*
+import kotlinx.android.synthetic.main.image_list_tab.view.*
+import kotlinx.android.synthetic.main.image_list.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

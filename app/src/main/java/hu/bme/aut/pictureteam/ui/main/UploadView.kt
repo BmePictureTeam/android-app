@@ -22,11 +22,10 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.models.Picture
-import hu.bme.aut.pictureteam.services.Categories
 import hu.bme.aut.pictureteam.services.PictureInteractions
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.detailed_view.*
-import kotlinx.android.synthetic.main.detailed_view.view.*
+import kotlinx.android.synthetic.main.image_detail_view.*
+import kotlinx.android.synthetic.main.image_detail_view.view.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.util.*

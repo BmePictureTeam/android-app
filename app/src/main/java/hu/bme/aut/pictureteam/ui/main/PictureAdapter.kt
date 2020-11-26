@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.models.Picture
 import hu.bme.aut.pictureteam.services.Categories
-import kotlinx.android.synthetic.main.row_item.view.*
+import kotlinx.android.synthetic.main.image_row.view.*
 import kotlin.math.min
 
 class PictureAdapter internal constructor(private val listener: OnPictureSelectedListener?) :
