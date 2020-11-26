@@ -1,7 +1,6 @@
 package hu.bme.aut.pictureteam.ui.main
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -18,26 +17,25 @@ import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
-import hu.bme.aut.pictureteam.MainActivity
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.models.Picture
 import hu.bme.aut.pictureteam.services.Categories
-import hu.bme.aut.pictureteam.services.Interactions
+import hu.bme.aut.pictureteam.services.PictureInteractions
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.detailed_view.*
 import kotlinx.android.synthetic.main.detailed_view.view.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.util.*
 
 class UploadView : Fragment() {
     private lateinit var imgbtn: ImageButton
-    private lateinit var mainActivity: MainActivity
     private lateinit var pageViewModel: PageViewModel
     private var selectedImage: Bitmap? = null
+    private val permissionResults: Channel<Boolean> = Channel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,23 +79,45 @@ class UploadView : Fragment() {
             val picture = Picture(selectedImage, title, categoryIds, description, null)
 
             lifecycleScope.launch {
-                val res = Interactions.upload(picture)
-                if (res.code() != 204) {
-                    Toast.makeText(
-                        context,
-                        "Upload failed: ${res.errorBody().toString()}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    Toast.makeText(context, "Upload succeeded", Toast.LENGTH_SHORT).show()
+                val toastMessage = try {
+                    PictureInteractions.upload(picture)
                     imgbtnUpload.setImageResource(R.drawable.placeholder)
                     tilName.editText?.text?.clear()
                     tilCategory.editText?.text?.clear()
                     tilDescription.editText?.text?.clear()
+                    "Upload succeeded"
+                } catch (e: Exception) {
+                    "Upload failed: ${e.message}"
                 }
+
+                Toast.makeText(
+                    context,
+                    toastMessage,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
+
         return root
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        _permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        for (res in grantResults) {
+            if (res != PackageManager.PERMISSION_GRANTED) {
+                lifecycleScope.launch {
+                    permissionResults.send(false)
+                }
+                return
+            }
+        }
+
+        lifecycleScope.launch {
+            permissionResults.send(true)
+        }
     }
 
     private fun validateImage(title: String?): Boolean {
@@ -118,9 +138,8 @@ class UploadView : Fragment() {
         private const val ARG_SECTION_NUMBER = "section_number"
 
         @JvmStatic
-        fun newInstance(mainActivity: MainActivity): UploadView {
+        fun newInstance(): UploadView {
             return UploadView().apply {
-                this.mainActivity = mainActivity
                 arguments = Bundle().apply {
                     putInt(ARG_SECTION_NUMBER, 2)
                 }
@@ -139,10 +158,15 @@ class UploadView : Fragment() {
                     startActivityForResult(takePicture, 0)
                 }
                 options[item] == "Choose from Gallery" -> {
-                    verifyStoragePermissions(mainActivity)
-                    val pickPhoto =
-                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                    startActivityForResult(pickPhoto, 1)
+                    lifecycleScope.launch {
+                        if (!requestPermissions()) {
+                            Toast.makeText(context, "Please grant permissions.", Toast.LENGTH_SHORT).show()
+                            return@launch
+                        }
+                        val pickPhoto =
+                            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                        startActivityForResult(pickPhoto, 1)
+                    }
                 }
                 options[item] == "Cancel" -> {
                     dialog.dismiss()
@@ -194,19 +218,16 @@ class UploadView : Fragment() {
      *
      * If the app does not has permission then the user will be prompted to grant permissions
      */
-    private fun verifyStoragePermissions(activity: Activity?) {
-        // Check if we have write permission
-        val permission = ActivityCompat.checkSelfPermission(
-            activity!!,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    private suspend fun requestPermissions(): Boolean {
+        requestPermissions(
+            PERMISSIONS_STORAGE,
+            REQUEST_EXTERNAL_STORAGE
         )
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                activity,
-                PERMISSIONS_STORAGE,
-                REQUEST_EXTERNAL_STORAGE
-            )
-        }
+
+        return permissionResults.receive()
     }
+
+//    private fun permission() : Int? {
+//        return context?.let { ContextCompat.checkSelfPermission(it, Manifest.permission.WRITE_EXTERNAL_STORAGE) }
+//    }
 }

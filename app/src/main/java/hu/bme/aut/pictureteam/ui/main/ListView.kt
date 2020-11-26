@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.services.Categories
-import hu.bme.aut.pictureteam.services.Interactions
+import hu.bme.aut.pictureteam.services.PictureInteractions
 import kotlinx.android.synthetic.main.list_view.view.*
 import kotlinx.android.synthetic.main.recycler_view.view.*
 import kotlinx.coroutines.Dispatchers
@@ -39,14 +39,14 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
         pageViewModel.text.observe(viewLifecycleOwner, Observer<String> {
         })
 
+        initRecyclerView()
+
         root.btnSearch.setOnClickListener {
             lifecycleScope.launch {
-                val images = Interactions.search(adapter)
+                val images = PictureInteractions.search()
                 adapter.setPictures(images.toMutableList())
             }
         }
-
-        initRecyclerView()
 
         return root
     }
@@ -54,12 +54,6 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
     private fun initRecyclerView() {
         root.recyclerview.layoutManager = LinearLayoutManager(context)
         adapter = PictureAdapter(this)
-/*
-        adapter.addItem("Macska")
-        adapter.addItem("Cica")
-        adapter.addItem("Kutya")
-        adapter.addItem("Glaucus Atlanticus")
-*/
         root.recyclerview.adapter = adapter
     }
 
