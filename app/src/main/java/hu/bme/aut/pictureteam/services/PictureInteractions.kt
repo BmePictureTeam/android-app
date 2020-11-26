@@ -6,6 +6,7 @@ import hu.bme.aut.pictureteam.models.Picture
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.HttpException
 import java.io.ByteArrayOutputStream
 
 class UploadException(msg: String) : Exception(msg)
@@ -17,7 +18,7 @@ object PictureInteractions {
         val api: Api = Api.getInstance()
 
         images = api.searchPictures().images.map { pic ->
-            val resBody = Api.getInstance().getPicture(pic.id)
+            val resBody = Api.getInstance().downloadPicture(pic.id)
             val resBytes = resBody.byteStream()
             val bitmap = BitmapFactory.decodeStream(resBytes)
 
@@ -49,7 +50,7 @@ object PictureInteractions {
                 ApiCreateImageRequestBody(
                     picture.categories,
                     picture.description,
-                    picture.title!!
+                    picture.title
                 )
             ).id
 
@@ -69,6 +70,34 @@ object PictureInteractions {
 
         if (res.code() != 204) {
             throw UploadException(res.errorBody().toString())
+        }
+    }
+
+    suspend fun getById(id: String): Picture? {
+        try {
+            val pic = Api.getInstance().getPicture(id).image
+            val resBody = Api.getInstance().downloadPicture(pic.id)
+            val resBytes = resBody.byteStream()
+            val bitmap = BitmapFactory.decodeStream(resBytes)
+
+            val rating = Api.getInstance().getPictureRating(pic.id)
+
+            return Picture(
+                title = pic.title,
+                id = pic.id,
+                image = bitmap,
+                categories = pic.categories.toMutableList(),
+                description = pic.description ?: "",
+                date = pic.date,
+                rating = rating.average,
+                ratingCount = rating.rating_count
+            )
+        } catch (e: HttpException) {
+            if (e.code() == 404) {
+                return null
+            }
+
+            throw e
         }
     }
 }

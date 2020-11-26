@@ -11,6 +11,10 @@ data class ApiSearchResponse(
     val images: List<ApiPicture>
 )
 
+data class ApiGetPictureResponse(
+    val image: ApiPicture
+)
+
 data class ApiCategoriesResponse(
     val categories: List<Category>
 )
@@ -50,11 +54,14 @@ interface Api {
         @Query("search") search: String? = null
     ): ApiSearchResponse
 
+    @GET("/images/{id}")
+    suspend fun getPicture(@Path("id") id: String): ApiGetPictureResponse
+
     @GET("/categories")
     suspend fun getCategories(): ApiCategoriesResponse
 
-    @GET("/images/{id}")
-    suspend fun getPicture(@Path("id") id: String): ResponseBody
+    @GET("/images/{id}/download")
+    suspend fun downloadPicture(@Path("id") id: String): ResponseBody
 
     @POST("/images")
     suspend fun createPicture(@Body body: ApiCreateImageRequestBody): ApiCreateImageResponse
@@ -102,7 +109,6 @@ interface Api {
 class ServiceInterceptor(
     private val token: String? = null
 ) : Interceptor {
-
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
 
@@ -119,5 +125,4 @@ class ServiceInterceptor(
 
         return chain.proceed(request)
     }
-
 }
