@@ -51,15 +51,26 @@ class PictureListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
         root.image_refresh.isRefreshing = true
         lifecycleScope.launch(Dispatchers.IO) {
             val t = search_text.text.toString()
-            val images = PictureInteractions.search(
-                0, if (t.isBlank()) {
+            val pictures = PictureInteractions.search(
+                0,
+                if (t.isBlank()) {
                     null
                 } else {
                     t
                 }
             )
             withContext(Dispatchers.Main) {
-                adapter.setPictures(images.toMutableList())
+                adapter.setPictures(pictures.toMutableList())
+
+                for (p in pictures) {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val bitmap = PictureInteractions.bitmap(p)
+                        withContext(Dispatchers.Main) {
+                            adapter.setBitmap(p.id!!, bitmap)
+                        }
+                    }
+                }
+
                 root.image_refresh.isRefreshing = false
             }
         }

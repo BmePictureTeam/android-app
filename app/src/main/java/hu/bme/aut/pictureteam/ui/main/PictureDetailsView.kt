@@ -1,5 +1,6 @@
 package hu.bme.aut.pictureteam.ui.main
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -74,8 +75,13 @@ class PictureDetailsView : AppCompatActivity() {
             setLoading(true)
             try {
                 val pic: Picture?
+                var bitmap: Bitmap? = null
                 withContext(Dispatchers.IO) {
                     pic = PictureInteractions.getById(id)
+
+                    if (pic != null) {
+                        bitmap = PictureInteractions.bitmap(pic)
+                    }
                 }
 
                 if (pic == null) {
@@ -83,7 +89,7 @@ class PictureDetailsView : AppCompatActivity() {
                     return@launch
                 }
 
-                image_large.setImageBitmap(pic.image)
+                image_large.setImageBitmap(bitmap)
                 image_title.text = pic.title
                 image_description.text = pic.description
                 image_categories.text =

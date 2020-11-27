@@ -7,7 +7,6 @@ data class Picture(
     val title: String,
     val description: String,
     val categories: MutableList<String>,
-    val image: Bitmap? = null,
     val id: String? = null,
     val date: String? = null,
     val rating: Float? = null,

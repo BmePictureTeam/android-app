@@ -1,5 +1,6 @@
 package hu.bme.aut.pictureteam.ui.main
 
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,12 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.models.Picture
 import hu.bme.aut.pictureteam.services.Categories
+import hu.bme.aut.pictureteam.services.PictureInteractions
 import kotlinx.android.synthetic.main.image_row.view.*
 import kotlin.math.min
 
 class PictureAdapter internal constructor(private val listener: OnPictureSelectedListener?) :
     RecyclerView.Adapter<PictureAdapter.PictureViewHolder>() {
     private var pictures: MutableList<Picture> = mutableListOf()
+    private var bitmaps: HashMap<String, Bitmap> = hashMapOf()
 
     interface OnPictureSelectedListener {
         fun onPictureSelected(id: String)
@@ -26,7 +29,8 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
     }
 
     override fun onBindViewHolder(holder: PictureViewHolder, position: Int) {
-        holder.setPicture(position, pictures[position])
+        val pic = pictures[position]
+        holder.setPicture(pic, bitmaps[pic.id])
     }
 
     override fun getItemCount(): Int {
@@ -35,14 +39,20 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
 
     fun setPictures(pictures: MutableList<Picture>) {
         this.pictures = pictures
+        this.bitmaps.clear()
+        notifyDataSetChanged()
+    }
+
+    fun setBitmap(id: String, bitmap: Bitmap) {
+        this.bitmaps[id] = bitmap
         notifyDataSetChanged()
     }
 
     inner class PictureViewHolder(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
-        fun setPicture(pos: Int, picture: Picture) {
-            itemView.row_image.setImageBitmap(picture.image?.scale(128, 128))
+        fun setPicture(picture: Picture, bitmap: Bitmap?) {
+            itemView.row_image.setImageBitmap(bitmap?.scale(128,128))
             itemView.row_item_name.text = picture.title
             itemView.row_item_categories.text =
                 formatList(

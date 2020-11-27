@@ -27,7 +27,6 @@ object PictureInteractions {
             Picture(
                 title = pic.title,
                 id = pic.id,
-                image = BitmapFactory.decodeStream(getImage(pic.id)),
                 categories = pic.categories.toMutableList(),
                 description = pic.description ?: "",
                 date = pic.date,
@@ -39,7 +38,7 @@ object PictureInteractions {
         return images
     }
 
-    suspend fun upload(picture: Picture) {
+    suspend fun upload(picture: Picture, bitmap: Bitmap) {
         val res: retrofit2.Response<Unit>
 
         Categories.updateCategories()
@@ -55,7 +54,7 @@ object PictureInteractions {
             ).id
 
         val stream = ByteArrayOutputStream()
-        picture.image!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
         stream.toByteArray()
         val byteArray = stream.toByteArray()
 
@@ -80,7 +79,6 @@ object PictureInteractions {
             return Picture(
                 title = pic.title,
                 id = pic.id,
-                image = BitmapFactory.decodeStream(getImage(pic.id)),
                 categories = pic.categories.toMutableList(),
                 description = pic.description ?: "",
                 date = pic.date,
@@ -112,12 +110,16 @@ object PictureInteractions {
         return true
     }
 
+    suspend fun bitmap(pic: Picture): Bitmap {
+        return BitmapFactory.decodeStream(loadPicture(pic))
+    }
+
     /**
      * Retrieves the image either from local file cache or
      * from the API.
      */
-    private suspend fun getImage(id: String): InputStream {
-        val localImage = cacheDir?.resolve(id)
+    suspend fun loadPicture(pic: Picture): InputStream {
+        val localImage = cacheDir?.resolve(pic.id!!)
         if (localImage != null) {
             try {
                 return localImage.inputStream()
@@ -126,7 +128,7 @@ object PictureInteractions {
             }
         }
 
-        var imageStream = Api.getInstance().downloadPicture(id).byteStream()
+        var imageStream = Api.getInstance().downloadPicture(pic.id!!).byteStream()
 
         // Save it, and serve it from file.
         if (localImage != null) {

@@ -72,13 +72,13 @@ class PictureUploadView : Fragment() {
             val description = tilDescription.editText?.text.toString()
 
             // TODO categories
-            val picture = Picture(title!!, description, mutableListOf(), selectedImage?.resize(1920, 1080))
+            val picture = Picture(title!!, description, mutableListOf())
 
             lifecycleScope.launch {
                 val toastMessage = try {
                     setLoading(true)
                     withContext(Dispatchers.IO) {
-                        PictureInteractions.upload(picture)
+                        PictureInteractions.upload(picture, selectedImage!!.resize(1920, 1080))
                     }
                     reset()
                     "Upload succeeded"
