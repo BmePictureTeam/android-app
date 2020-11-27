@@ -12,4 +12,5 @@
     <string name="categories">Categories</string>
     <string name="average_rating">Average Rating</string>
     <string name="search">Search</string>
+    <string name="select_categories">Select categories</string>
 </resources>

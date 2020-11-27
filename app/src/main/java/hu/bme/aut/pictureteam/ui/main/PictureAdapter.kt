@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.models.Picture
 import hu.bme.aut.pictureteam.services.Categories
-import hu.bme.aut.pictureteam.services.PictureInteractions
 import kotlinx.android.synthetic.main.image_row.view.*
 import kotlin.math.min
 
@@ -73,5 +72,11 @@ private fun formatList(items: List<String>, max: Int? = null): String {
         return items.joinToString(", ");
     }
 
-    return items.slice(0 until min(items.size, max)).joinToString(", ") + ", ..."
+    val s = items.slice(0 until min(items.size, max)).joinToString(", ")
+
+    return if (max < items.size) {
+        "$s, ..."
+    } else {
+        s
+    }
 }

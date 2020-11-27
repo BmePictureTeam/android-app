@@ -1,12 +1,9 @@
 package hu.bme.aut.pictureteam.models
 
-import android.graphics.Bitmap
-import hu.bme.aut.pictureteam.services.Api
-
 data class Picture(
     val title: String,
     val description: String,
-    val categories: MutableList<String>,
+    val categories: List<String>,
     val id: String? = null,
     val date: String? = null,
     val rating: Float? = null,

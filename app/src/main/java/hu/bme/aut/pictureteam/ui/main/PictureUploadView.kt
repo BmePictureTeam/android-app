@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +19,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.models.Picture
@@ -33,16 +33,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class PictureUploadView : Fragment() {
+class PictureUploadView : Fragment(), PickCategoryDialog.CategoryPickListener {
     private lateinit var imgbtn: ImageButton
 
     private var loading: Boolean = false
     private var selectedImage: Bitmap? = null
+    private var selectedCategories: List<String> = listOf()
     private val permissionResults: Channel<Boolean> = Channel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
@@ -71,8 +71,7 @@ class PictureUploadView : Fragment() {
 
             val description = tilDescription.editText?.text.toString()
 
-            // TODO categories
-            val picture = Picture(title!!, description, mutableListOf())
+            val picture = Picture(title!!, description, selectedCategories)
 
             lifecycleScope.launch {
                 val toastMessage = try {
@@ -94,6 +93,16 @@ class PictureUploadView : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+        }
+
+        root.btnSelectCategories.setOnClickListener {
+            val dialog = PickCategoryDialog(this)
+
+
+            dialog.show(
+                childFragmentManager,
+                "PICK_CATEGORY_DIALOG"
+            )
         }
 
         return root
@@ -124,19 +133,16 @@ class PictureUploadView : Fragment() {
             btnUpload.startAnimation()
             tilName.isEnabled = false
             tilDescription.isEnabled = false
-            tilCategory.isEnabled = false
         } else {
             btnUpload.revertAnimation();
             tilName.isEnabled = true
             tilDescription.isEnabled = true
-            tilCategory.isEnabled = true
         }
     }
 
     private fun reset() {
         imgbtnUpload.setImageResource(R.drawable.placeholder)
         tilName.editText?.text?.clear()
-        tilCategory.editText?.text?.clear()
         tilDescription.editText?.text?.clear()
     }
 
@@ -246,6 +252,12 @@ class PictureUploadView : Fragment() {
         )
 
         return permissionResults.receive()
+    }
+
+    override fun onCategoryPicked(categories: List<String>) {
+        Log.d("categories", categories.joinToString(","))
+
+        selectedCategories = categories
     }
 
 //    private fun permission() : Int? {
