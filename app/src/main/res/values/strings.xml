@@ -7,6 +7,9 @@
     <string name="date">Date</string>
     <string name="category">Category</string>
     <string name="name">Name</string>
-    <string name="search">Search</string>
     <string name="upload_image">Upload image</string>
+    <string name="title">Title</string>
+    <string name="categories">Categories</string>
+    <string name="average_rating">Average Rating</string>
+    <string name="search">Search</string>
 </resources>

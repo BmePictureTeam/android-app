@@ -22,14 +22,12 @@ object PictureInteractions {
         val api: Api = Api.getInstance()
 
         images = api.searchPictures(offset ?: 0, 10, search = text).images.map { pic ->
-            val bitmap = BitmapFactory.decodeStream(getImage(pic.id))
-
             val rating = Api.getInstance().getPictureRating(pic.id)
 
             Picture(
                 title = pic.title,
                 id = pic.id,
-                image = bitmap,
+                image = BitmapFactory.decodeStream(getImage(pic.id)),
                 categories = pic.categories.toMutableList(),
                 description = pic.description ?: "",
                 date = pic.date,
@@ -77,16 +75,12 @@ object PictureInteractions {
     suspend fun getById(id: String): Picture? {
         try {
             val pic = Api.getInstance().getPicture(id).image
-            val resBody = Api.getInstance().downloadPicture(pic.id)
-            val resBytes = resBody.byteStream()
-            val bitmap = BitmapFactory.decodeStream(resBytes)
-
             val rating = Api.getInstance().getPictureRating(pic.id)
 
             return Picture(
                 title = pic.title,
                 id = pic.id,
-                image = bitmap,
+                image = BitmapFactory.decodeStream(getImage(pic.id)),
                 categories = pic.categories.toMutableList(),
                 description = pic.description ?: "",
                 date = pic.date,
@@ -103,6 +97,22 @@ object PictureInteractions {
     }
 
     /**
+     * Returns whether the picture can be rated.
+     */
+    suspend fun rate(id: String, rating: Int): Boolean {
+        try {
+            Api.getInstance().ratePicture(id, ApiRatePictureRequestBody(rating = rating))
+        } catch (e: HttpException) {
+            if (e.code() == 403) {
+                return false
+            }
+            throw e
+        }
+
+        return true
+    }
+
+    /**
      * Retrieves the image either from local file cache or
      * from the API.
      */
@@ -111,7 +121,7 @@ object PictureInteractions {
         if (localImage != null) {
             try {
                 return localImage.inputStream()
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 // Not found locally, can be ignored.
             }
         }

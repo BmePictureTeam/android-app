@@ -16,7 +16,7 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
     private var pictures: MutableList<Picture> = mutableListOf()
 
     interface OnPictureSelectedListener {
-        fun onPictureSelected(item: Int)
+        fun onPictureSelected(id: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PictureViewHolder {
@@ -33,18 +33,8 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
         return pictures.size
     }
 
-    fun addPicture(p: Picture) {
-        pictures.add(p)
-        notifyItemInserted(pictures.size - 1)
-    }
-
     fun setPictures(pictures: MutableList<Picture>) {
         this.pictures = pictures
-        notifyDataSetChanged()
-    }
-
-    fun clear() {
-        pictures.clear()
         notifyDataSetChanged()
     }
 
@@ -59,10 +49,9 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
                     picture.categories.mapNotNull { Categories.categoryName(it) }, 3
                 )
             itemView.row_image_rating.rating = picture.rating ?: 0.0f
-            itemView.setOnClickListener { listener?.onPictureSelected(pos) }
+            itemView.setOnClickListener { listener?.onPictureSelected(picture.id!!) }
         }
     }
-
 }
 
 private fun formatList(items: List<String>, max: Int? = null): String {

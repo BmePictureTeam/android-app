@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -15,35 +16,33 @@ import hu.bme.aut.pictureteam.services.Categories
 import hu.bme.aut.pictureteam.services.PictureInteractions
 import kotlinx.android.synthetic.main.image_list_tab.view.*
 import kotlinx.android.synthetic.main.image_list.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.android.synthetic.main.image_list_tab.*
+import kotlinx.coroutines.*
 
-class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
-    private lateinit var pageViewModel: PageViewModel
+class PictureListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
     private lateinit var adapter: PictureAdapter
     private lateinit var root: View
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        pageViewModel = ViewModelProviders.of(this).get(PageViewModel::class.java).apply {
-            setIndex(arguments?.getInt(ARG_SECTION_NUMBER) ?: 1)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         root = inflater.inflate(R.layout.image_list_tab, container, false)
-        pageViewModel.text.observe(viewLifecycleOwner, Observer<String> {
-        })
 
         initRecyclerView()
 
-        root.btnSearch.setOnClickListener { updateImages() }
+        var textChangedJob: Job? = null
 
-//        updateImages()
+        root.search_text.addTextChangedListener {
+            textChangedJob?.cancel()
+
+            textChangedJob = lifecycleScope.launch {
+                delay(500)
+                updateImages()
+            }
+        }
+
+        updateImages()
 
         return root
     }
@@ -51,7 +50,14 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
     private fun updateImages() {
         root.image_refresh.isRefreshing = true
         lifecycleScope.launch(Dispatchers.IO) {
-            val images = PictureInteractions.search(0,null)
+            val t = search_text.text.toString()
+            val images = PictureInteractions.search(
+                0, if (t.isBlank()) {
+                    null
+                } else {
+                    t
+                }
+            )
             withContext(Dispatchers.Main) {
                 adapter.setPictures(images.toMutableList())
                 root.image_refresh.isRefreshing = false
@@ -68,11 +74,10 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
 
     companion object {
         private const val ARG_SECTION_NUMBER = "section_number"
-        var pictureSelected: Int? = null
 
         @JvmStatic
-        fun newInstance(): ListView {
-            return ListView().apply {
+        fun newInstance(): PictureListView {
+            return PictureListView().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_SECTION_NUMBER, 1)
                 }
@@ -86,8 +91,9 @@ class ListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
         }
     }
 
-    override fun onPictureSelected(item: Int) {
-        pictureSelected = item
-        startActivity(Intent(context, ViewPicture::class.java))
+    override fun onPictureSelected(id: String) {
+        val intent = Intent(context, PictureDetailsView::class.java)
+        intent.putExtra("id", id);
+        startActivity(intent)
     }
 }

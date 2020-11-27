@@ -23,39 +23,41 @@ import androidx.lifecycle.lifecycleScope
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.models.Picture
 import hu.bme.aut.pictureteam.services.PictureInteractions
+import hu.bme.aut.pictureteam.util.resize
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.image_detail_view.*
-import kotlinx.android.synthetic.main.image_detail_view.view.*
+import kotlinx.android.synthetic.main.image_upload_view.*
+import kotlinx.android.synthetic.main.image_upload_view.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class UploadView : Fragment() {
+class PictureUploadView : Fragment() {
     private lateinit var imgbtn: ImageButton
-    private lateinit var pageViewModel: PageViewModel
+
+    private var loading: Boolean = false
     private var selectedImage: Bitmap? = null
     private val permissionResults: Channel<Boolean> = Channel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pageViewModel = ViewModelProviders.of(this).get(PageViewModel::class.java).apply {
-            setIndex(arguments?.getInt(ARG_SECTION_NUMBER) ?: 2)
-        }
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.image_detail_view, container, false)
-        pageViewModel.text.observe(viewLifecycleOwner, {
-        })
+        val root = inflater.inflate(R.layout.image_upload_view, container, false)
 
         root.tilDate.visibility = View.GONE
 
         root.imgbtnUpload.setOnClickListener {
+            if (loading) {
+                return@setOnClickListener
+            }
+
             context?.let { it1 -> selectImage(it1) }
         }
         imgbtn = root.imgbtnUpload
@@ -70,23 +72,20 @@ class UploadView : Fragment() {
             val description = tilDescription.editText?.text.toString()
 
             // TODO categories
-            val picture = Picture(title!!, description, mutableListOf(), selectedImage)
+            val picture = Picture(title!!, description, mutableListOf(), selectedImage?.resize(1920, 1080))
 
             lifecycleScope.launch {
                 val toastMessage = try {
-                    root.btnUpload.startAnimation()
+                    setLoading(true)
                     withContext(Dispatchers.IO) {
                         PictureInteractions.upload(picture)
                     }
-                    imgbtnUpload.setImageResource(R.drawable.placeholder)
-                    tilName.editText?.text?.clear()
-                    tilCategory.editText?.text?.clear()
-                    tilDescription.editText?.text?.clear()
+                    reset()
                     "Upload succeeded"
                 } catch (e: Exception) {
                     "Upload failed: ${e.message}"
                 } finally {
-                    root.btnUpload.revertAnimation();
+                    setLoading(false)
                 }
 
                 Toast.makeText(
@@ -119,6 +118,28 @@ class UploadView : Fragment() {
         }
     }
 
+    private fun setLoading(v: Boolean) {
+        loading = v
+        if (v) {
+            btnUpload.startAnimation()
+            tilName.isEnabled = false
+            tilDescription.isEnabled = false
+            tilCategory.isEnabled = false
+        } else {
+            btnUpload.revertAnimation();
+            tilName.isEnabled = true
+            tilDescription.isEnabled = true
+            tilCategory.isEnabled = true
+        }
+    }
+
+    private fun reset() {
+        imgbtnUpload.setImageResource(R.drawable.placeholder)
+        tilName.editText?.text?.clear()
+        tilCategory.editText?.text?.clear()
+        tilDescription.editText?.text?.clear()
+    }
+
     private fun validateImage(title: String?): Boolean {
         if (selectedImage == null) {
             Toast.makeText(context, "Please select an image.", Toast.LENGTH_SHORT).show()
@@ -137,8 +158,8 @@ class UploadView : Fragment() {
         private const val ARG_SECTION_NUMBER = "section_number"
 
         @JvmStatic
-        fun newInstance(): UploadView {
-            return UploadView().apply {
+        fun newInstance(): PictureUploadView {
+            return PictureUploadView().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_SECTION_NUMBER, 2)
                 }

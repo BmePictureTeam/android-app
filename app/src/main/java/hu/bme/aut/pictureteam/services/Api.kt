@@ -43,6 +43,10 @@ data class ApiPictureRatingResponse(
     val rating_count: Int
 )
 
+data class ApiRatePictureRequestBody(
+    val rating: Int
+)
+
 interface Api {
     @POST("/auth/login")
     suspend fun login(@Body login: ApiLoginBody): ApiLoginResponse
@@ -57,8 +61,6 @@ interface Api {
     @GET("/images/{id}")
     suspend fun getPicture(@Path("id") id: String): ApiGetPictureResponse
 
-    @GET("/categories")
-    suspend fun getCategories(): ApiCategoriesResponse
 
     @GET("/images/{id}/download")
     suspend fun downloadPicture(@Path("id") id: String): ResponseBody
@@ -75,6 +77,12 @@ interface Api {
 
     @GET("/images/{id}/rating")
     suspend fun getPictureRating(@Path("id") id: String): ApiPictureRatingResponse
+
+    @PUT("/images/{id}/rating")
+    suspend fun ratePicture(@Path("id") id: String, @Body rating: ApiRatePictureRequestBody)
+
+    @GET("/categories")
+    suspend fun getCategories(): ApiCategoriesResponse
 
     companion object {
         private const val URL: String = "https://api.temalab.cicum.icu"
@@ -112,15 +120,11 @@ class ServiceInterceptor(
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
 
-        if (request.header("No-Authentication") == null) {
-            //val token = getTokenFromSharedPreference();
-            //or use Token Function
-            if (!token.isNullOrEmpty()) {
-                val finalToken = "Bearer $token"
-                request = request.newBuilder()
-                    .addHeader("Authorization", finalToken)
-                    .build()
-            }
+        if (!token.isNullOrEmpty()) {
+            val finalToken = "Bearer $token"
+            request = request.newBuilder()
+                .addHeader("Authorization", finalToken)
+                .build()
         }
 
         return chain.proceed(request)
