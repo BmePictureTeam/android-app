@@ -3,6 +3,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="tab_text_1">List</string>
     <string name="tab_text_2">Upload</string>
+    <string name="tab_text_3">Top List</string>
     <string name="description">Description</string>
     <string name="date">Date</string>
     <string name="category">Category</string>

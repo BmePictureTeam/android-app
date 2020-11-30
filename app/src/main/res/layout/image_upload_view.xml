@@ -7,7 +7,7 @@
     style="@android:style/Widget.DeviceDefault.Light.ScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.PictureUploadView">
+    tools:context=".ui.main.pictureUpload.PictureUploadView">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"

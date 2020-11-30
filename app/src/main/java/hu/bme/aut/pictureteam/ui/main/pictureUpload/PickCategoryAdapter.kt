@@ -1,4 +1,4 @@
-package hu.bme.aut.pictureteam.ui.main
+package hu.bme.aut.pictureteam.ui.main.pictureUpload
 
 import android.util.Log
 import android.view.LayoutInflater

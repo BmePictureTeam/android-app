@@ -1,4 +1,4 @@
-package hu.bme.aut.pictureteam.ui.main
+package hu.bme.aut.pictureteam.ui.main.pictureUpload
 
 import android.app.Dialog
 import android.os.Bundle
@@ -13,7 +13,8 @@ import hu.bme.aut.pictureteam.models.Category
 import hu.bme.aut.pictureteam.services.Categories
 import kotlinx.android.synthetic.main.pickcategorylayout.view.*
 
-class PickCategoryDialog(private val listener: CategoryPickListener): DialogFragment(), PickCategoryAdapter.CategorySelectionListener {
+class PickCategoryDialog(private val listener: CategoryPickListener): DialogFragment(),
+    PickCategoryAdapter.CategorySelectionListener {
     private lateinit var adapter: PickCategoryAdapter
     private val pickedCategories: HashSet<String> = hashSetOf()
     private lateinit var recyclerView: RecyclerView

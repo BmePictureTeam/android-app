@@ -1,4 +1,4 @@
-package hu.bme.aut.pictureteam.ui.main
+package hu.bme.aut.pictureteam.ui.main.pictureList
 
 import android.graphics.Bitmap
 import android.view.LayoutInflater

@@ -1,4 +1,4 @@
-package hu.bme.aut.pictureteam.ui.main
+package hu.bme.aut.pictureteam.ui.main.pictureUpload
 
 import android.Manifest
 import android.content.Context

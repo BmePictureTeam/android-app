@@ -1,12 +1,14 @@
-package hu.bme.aut.pictureteam
+package hu.bme.aut.pictureteam.ui.login
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.services.Api
 import hu.bme.aut.pictureteam.services.ApiLoginBody
+import hu.bme.aut.pictureteam.ui.main.MainActivity
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
