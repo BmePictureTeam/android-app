@@ -27,7 +27,6 @@ class UserRatingListView : Fragment() {
 
         initRecyclerView()
 
-
         updateRatings()
 
         return root

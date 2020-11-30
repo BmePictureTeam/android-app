@@ -29,6 +29,8 @@ class PictureListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
     ): View {
         root = inflater.inflate(R.layout.image_list_tab, container, false)
 
+        offset = 0
+
         initRecyclerView()
 
         var textChangedJob: Job? = null
