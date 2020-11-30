@@ -38,6 +38,7 @@ class PictureListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
 
             textChangedJob = lifecycleScope.launch {
                 delay(500)
+                offset = 0
                 updateImages()
             }
         }
