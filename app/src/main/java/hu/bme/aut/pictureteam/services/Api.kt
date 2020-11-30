@@ -47,6 +47,15 @@ data class ApiRatePictureRequestBody(
     val rating: Int
 )
 
+data class UserRating(
+    val name: String,
+    val average_rating: Float
+)
+
+data class GetUserRatingsResponse(
+    val ratings: List<UserRating>
+)
+
 interface Api {
     @POST("/auth/login")
     suspend fun login(@Body login: ApiLoginBody): ApiLoginResponse
@@ -83,6 +92,9 @@ interface Api {
 
     @GET("/categories")
     suspend fun getCategories(): ApiCategoriesResponse
+
+    @GET("/images/ratings")
+    suspend fun getUserRatings(): GetUserRatingsResponse
 
     companion object {
         private const val URL: String = "https://api.temalab.cicum.icu"

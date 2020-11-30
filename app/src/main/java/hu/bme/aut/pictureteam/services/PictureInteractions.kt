@@ -3,6 +3,7 @@ package hu.bme.aut.pictureteam.services
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import hu.bme.aut.pictureteam.models.Picture
+import hu.bme.aut.pictureteam.models.UserRating
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -10,6 +11,7 @@ import retrofit2.HttpException
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
+
 
 class UploadException(msg: String) : Exception(msg)
 
@@ -114,11 +116,20 @@ object PictureInteractions {
         return BitmapFactory.decodeStream(loadPicture(pic))
     }
 
+    suspend fun userRatings(): List<UserRating> {
+        return Api.getInstance().getUserRatings().ratings.map {
+            UserRating(
+                name = it.name,
+                rating = it.average_rating
+            )
+        }
+    }
+
     /**
      * Retrieves the image either from local file cache or
      * from the API.
      */
-    suspend fun loadPicture(pic: Picture): InputStream {
+    private suspend fun loadPicture(pic: Picture): InputStream {
         val localImage = cacheDir?.resolve(pic.id!!)
         if (localImage != null) {
             try {
