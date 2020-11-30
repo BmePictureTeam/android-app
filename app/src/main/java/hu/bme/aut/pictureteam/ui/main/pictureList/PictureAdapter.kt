@@ -42,6 +42,11 @@ class PictureAdapter internal constructor(private val listener: OnPictureSelecte
         notifyDataSetChanged()
     }
 
+    fun addPictures(pictures: MutableList<Picture>) {
+        this.pictures.addAll(pictures)
+        notifyDataSetChanged()
+    }
+
     fun setBitmap(id: String, bitmap: Bitmap) {
         this.bitmaps[id] = bitmap
         notifyDataSetChanged()

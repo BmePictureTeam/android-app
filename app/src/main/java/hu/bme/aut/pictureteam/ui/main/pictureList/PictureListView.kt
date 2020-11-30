@@ -2,6 +2,7 @@ package hu.bme.aut.pictureteam.ui.main.pictureList
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,17 +10,18 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.services.Categories
 import hu.bme.aut.pictureteam.services.PictureInteractions
-import kotlinx.android.synthetic.main.image_list_tab.view.*
-import kotlinx.android.synthetic.main.image_list.view.*
 import kotlinx.android.synthetic.main.image_list_tab.*
+import kotlinx.android.synthetic.main.image_list_tab.view.*
 import kotlinx.coroutines.*
 
 class PictureListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
     private lateinit var adapter: PictureAdapter
     private lateinit var root: View
+    private var offset: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,15 +52,24 @@ class PictureListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
         lifecycleScope.launch(Dispatchers.IO) {
             val t = search_text.text.toString()
             val pictures = PictureInteractions.search(
-                0,
+                offset,
                 if (t.isBlank()) {
                     null
                 } else {
                     t
                 }
             )
+
+            Log.d("pics", "${adapter.itemCount}")
+
             withContext(Dispatchers.Main) {
-                adapter.setPictures(pictures.toMutableList())
+                if (offset == 0) {
+                    adapter.setPictures(pictures.toMutableList())
+                } else {
+                    adapter.addPictures(pictures.toMutableList())
+                }
+
+                offset += PictureInteractions.PICTURE_LIMIT
 
                 for (p in pictures) {
                     lifecycleScope.launch(Dispatchers.IO) {
@@ -76,9 +87,22 @@ class PictureListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
 
     private fun initRecyclerView() {
         root.recyclerview.layoutManager = LinearLayoutManager(context)
-        root.image_refresh.setOnRefreshListener(::updateImages)
+        root.image_refresh.setOnRefreshListener {
+            offset = 0
+            updateImages()
+        }
         adapter = PictureAdapter(this)
         root.recyclerview.adapter = adapter
+
+        root.recyclerview.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (!recyclerView.canScrollVertically(RecyclerView.FOCUS_DOWN))
+                    if (offset != 0) {
+                        updateImages()
+                    }
+            }
+        })
     }
 
     companion object {

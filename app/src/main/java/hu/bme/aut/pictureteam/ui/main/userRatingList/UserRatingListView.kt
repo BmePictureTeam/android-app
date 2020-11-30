@@ -10,11 +10,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import hu.bme.aut.pictureteam.R
 import hu.bme.aut.pictureteam.services.Categories
 import hu.bme.aut.pictureteam.services.PictureInteractions
-import kotlinx.android.synthetic.main.image_list_tab.view.*
-import kotlinx.android.synthetic.main.image_list.view.*
-import kotlinx.android.synthetic.main.image_list_tab.*
 import kotlinx.android.synthetic.main.user_rating_list.view.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class UserRatingListView : Fragment() {
     private lateinit var adapter: UserRatingAdapter

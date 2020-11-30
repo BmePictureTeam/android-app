@@ -17,13 +17,14 @@ class UploadException(msg: String) : Exception(msg)
 
 object PictureInteractions {
     var cacheDir: File? = null
+    const val PICTURE_LIMIT: Int = 5
 
-    suspend fun search(offset: Int? = 0, text: String? = null): List<Picture> {
+    suspend fun search(offset: Int = 0, text: String? = null): List<Picture> {
         val images: List<Picture>
 
         val api: Api = Api.getInstance()
 
-        images = api.searchPictures(offset ?: 0, 10, search = text).images.map { pic ->
+        images = api.searchPictures(offset, PICTURE_LIMIT, search = text).images.map { pic ->
             val rating = Api.getInstance().getPictureRating(pic.id)
 
             Picture(
