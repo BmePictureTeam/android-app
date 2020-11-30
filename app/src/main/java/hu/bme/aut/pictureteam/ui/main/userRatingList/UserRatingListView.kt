@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.bme.aut.pictureteam.R
-import hu.bme.aut.pictureteam.services.Categories
 import hu.bme.aut.pictureteam.services.PictureInteractions
 import kotlinx.android.synthetic.main.user_rating_list.view.*
 import kotlinx.coroutines.Dispatchers
@@ -57,12 +56,6 @@ class UserRatingListView : Fragment() {
             return UserRatingListView().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_SECTION_NUMBER, 3)
-                }
-
-                lifecycleScope.launch {
-                    withContext(Dispatchers.IO) {
-                        Categories.updateCategories()
-                    }
                 }
             }
         }
