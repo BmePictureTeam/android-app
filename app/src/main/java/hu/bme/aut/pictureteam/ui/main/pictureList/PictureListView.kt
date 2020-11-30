@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.image_list_tab.view.*
 import kotlinx.coroutines.*
 
 class PictureListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
-    private lateinit var adapter: PictureAdapter
+    private val adapter: PictureAdapter = PictureAdapter(this)
     private lateinit var root: View
     private var offset: Int = 0
 
@@ -28,8 +28,6 @@ class PictureListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
         savedInstanceState: Bundle?
     ): View {
         root = inflater.inflate(R.layout.image_list_tab, container, false)
-
-        offset = 0
 
         initRecyclerView()
 
@@ -93,7 +91,6 @@ class PictureListView : Fragment(), PictureAdapter.OnPictureSelectedListener {
             offset = 0
             updateImages()
         }
-        adapter = PictureAdapter(this)
         root.recyclerview.adapter = adapter
 
         root.recyclerview.addOnScrollListener(object : RecyclerView.OnScrollListener() {

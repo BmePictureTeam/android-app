@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class UserRatingListView : Fragment() {
-    private lateinit var adapter: UserRatingAdapter
+    private var adapter: UserRatingAdapter = UserRatingAdapter()
     private lateinit var root: View
 
     override fun onCreateView(
@@ -46,7 +46,6 @@ class UserRatingListView : Fragment() {
     private fun initRecyclerView() {
         root.user_rating_recyclerview.layoutManager = LinearLayoutManager(context)
         root.user_rating_refresh.setOnRefreshListener(::updateRatings)
-        adapter = UserRatingAdapter()
         root.user_rating_recyclerview.adapter = adapter
     }
 
