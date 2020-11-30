@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">PictureTeam</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="tab_text_1">List</string>
+    <string name="tab_text_2">Upload</string>
+    <string name="tab_text_3">Top List</string>
+    <string name="description">Description</string>
+    <string name="date">Date</string>
+    <string name="category">Category</string>
+    <string name="name">Name</string>
+    <string name="upload_image">Upload image</string>
+    <string name="title">Title</string>
+    <string name="categories">Categories</string>
+    <string name="average_rating">Average Rating</string>
+    <string name="search">Search</string>
+    <string name="select_categories">Select categories</string>
 </resources>
